@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>テスト</title>
+<meta name="description" content="テスト中">
+<link rel="stylesheet" href="/static/style.css">
+{% endblock %}
+
+{% block body %}
+
+<div class = "container">
+
+    <header class = "site_header">
+        <div class="site_header_wrapper">
+            <a class="brand">ParKeeper</a>
+        </div>
+    </header>
+
+    <div class="detail">
+        <div class="detail_txt">
+            <a class="toilet_detail">トイレA：5→3→1</a>
+            <a class="toilet_detail">トイレB：9→6→7→3→1</a>
+            <a class="box_detail">ゴミ箱A：11→8→4→1</a>
+        </div>
+    </div>
+
+    <form action="/map" class="map_set" method="POST">
+
+        <div class="btn_map">
+            <input type = "submit" name = "btn" value = "ALL" class="btn_01"></input>
+            <input type = "submit" name = "btn" value = "トイレA" class="btn_02"></input>
+            <input type = "submit" name = "btn" value = "トイレB" class="btn_03"></input>
+            <input type = "submit" name = "btn" value = "ゴミ箱A" class="btn_04"></input>
+            <div class = "logout">
+                <input type="submit" name= "btn" value = "ログアウト"></button>
+            </div>
+        </div>
+
+        <div class = "map">
+            <iframe class= "frame_center" src="http://127.0.0.1:5000/map" width="1300" height="800" style="border-radius: 20px;"></iframe>
+        </div>
+
+    </form>
+
+</div>
+{% endblock %}
