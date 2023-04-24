@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>テスト</title>
+<meta name="description" content="テスト中">
+<link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
+<!--<link rel="stylesheet" href="{{url_for('static',filename='button.css')}}">-->
+<!-- <meta http-equiv="refresh" content=10; URL="http://127.0.0.1:5000"> -->
+{% endblock %}
+
+{% block body %}
+<h1 style="text-align:center"><font size="20">ParKeeper</font></h1>
+
+<div style="padding: 10px; margin-bottom: 10px; border: 1px solid #333333;">
+    <font size="10">トイレAは{{indextoa_res}}人使用しました。<br>
+    トイレBは{{indextob_res}}人使用しました。</br>
+    ゴミ箱は{{indexga_res}}%蓄積されています。</font>
+</div>
+<div id="left">
+    <div style="padding: 10px; margin-bottom: 10px; border: 1px solid #333333;">
+        <font size="10">all</font>
+    </div></br>
+    <div style="padding: 10px; margin-bottom: 10px; border: 1px solid #333333;">
+        <font size="10">トイレA</font>
+    </div></br>
+    <div style="padding: 10px; margin-bottom: 10px; border: 1px solid #333333;">
+        <font size="10">トイレB</font>
+    </div></br>
+    <div style="padding: 10px; margin-bottom: 10px; border: 1px solid #333333;">
+        <font size="10">ゴミ箱</font>
+    </div>
+    
+    
+
+    </div>
+
+    
+
+  <hr>
+<div id="main">
+<iframe  class= "frame_center" src="http://127.0.0.1:5000/mapyoyogi" width="100%" height="500" style="border-radius: 20px;"></iframe>
+</div>
+<div id="footer">
+    <a href="{{url_for('foliummap')}}">
+        <!--urlはリンク先の関数名-->
+        <button class="favorite styled"
+            type="button" onclick="loction.href='http://127.0.0.1:5000/map'">
+        ログアウト
+        </button></a>
+    </div>
+{% endblock %}
