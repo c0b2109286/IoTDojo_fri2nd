@@ -67,22 +67,22 @@ def resp(text,toileta_num,garbage_num,toiletb_num):
             garbage_num=int(text[2])
     return toileta_num,toiletb_num,garbage_num
 
-@app.route('/',methods=['GET','POST'])
+@app.route('/useryoyogi',methods=['GET','POST'])
 def map():
     global TOILETA,GARBAGE,TOILETB
     toileta_num=0
     toiletb_num=0
     garbage_num=0
-    text=["70","120","20"]
+    text=["0","70","100"]
     #text = request.form.getlist('item')
     toileta_num,toiletb_num,garbage_num=resp(text,toileta_num,toiletb_num,garbage_num)
     #print(toileta_num)
-    return render_template('index2.html',indextoa_res=toileta_num,indextob_res=toiletb_num,indexga_res=garbage_num)
+    return render_template('index4.html',indextoa_res=toileta_num,indextob_res=toiletb_num,indexga_res=garbage_num)
 
 
 
 
-@app.route('/map',methods = ["GET"])
+@app.route('/mapyoyogi',methods = ["GET"])
 def foliummap():
     global TOILETA,GARBAGE,TOILETB
     toilet_lis=[TOILETA,TOILETB]
@@ -104,7 +104,7 @@ def foliummap():
 
 
     for gps, ins in zip(gps_group, ins_group):
-        #print(f"どうどう{gps,ins}")
+        print(f"どうどう{gps,ins}")
         if ins == "toilet":
                 if toilet_lis[toilet_num]==0 :
                     icon_image = "./image/toilet_b.png"
@@ -142,8 +142,8 @@ def foliummap():
 
         folium.Marker(location=gps,icon = icon).add_to(folium_map)
 
-    folium_map.save('templates/index.html')
-    return render_template('index.html')
+    folium_map.save('templates/index3.html')
+    return render_template('index3.html')
 
 # @app.route('/map',methods = ["GET"])
 # def foliummap():
@@ -184,29 +184,29 @@ def foliummap():
 #     return render_template('index_admin.html')
 
 
-@app.route("/create", methods = ["POST", "GET"])
-def a():
-    if request.method == 'GET':
-        return render_template('index3.html')
+# @app.route("/create", methods = ["POST", "GET"])
+# def a():
+#     if request.method == 'GET':
+#         return render_template('index.html')
 
-    else:
-        gps = request.form.get('gps')
-        ins = request.form.get('ins')
+#     else:
+#         gps = request.form.get('gps')
+#         ins = request.form.get('ins')
             
-        new_post = Post(gps = gps, ins = ins)
+#         new_post = Post(gps = gps, ins = ins)
 
-        db.session.add(new_post)
-        db.session.commit()
-        return redirect("/create")
+#         db.session.add(new_post)
+#         db.session.commit()
+#         return redirect("/create")
 
-@app.route('/delete')
-def delete():
-    posts = Post.query.all()
+# @app.route('/delete')
+# def delete():
+#     posts = Post.query.all()
 
-    for post in posts:
-        db.session.delete(post)
-        db.session.commit()
-    return redirect('/create')
+#     for post in posts:
+#         db.session.delete(post)
+#         db.session.commit()
+#     return redirect('/create')
 
 
 
