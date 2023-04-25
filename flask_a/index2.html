@@ -24,7 +24,7 @@
         </div>
     </div>
 
-    <form action="/map" class="map_set" method="POST">
+    <form action="/admin" class="map_set" method="POST">
 
         <div class="btn_map">
             <input type = "submit" name = "btn" value = "ALL" class="btn_01"></input>
@@ -37,7 +37,7 @@
         </div>
 
         <div class = "map">
-            <iframe class= "frame_center" src="http://127.0.0.1:5000/map" width="1300" height="800" style="border-radius: 20px;"></iframe>
+            <iframe class= "frame_center" src="http://127.0.0.1:5000/map/{{location}}" width="1300" height="800" style="border-radius: 20px;"></iframe>
         </div>
 
     </form>
