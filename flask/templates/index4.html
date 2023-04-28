@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<title>テスト</title>
+<title>利用者</title>
 <meta name="description" content="テスト中">
-<link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
+<link rel="stylesheet" href="{{url_for('static',filename='userstyle.css')}}">
 <!--<link rel="stylesheet" href="{{url_for('static',filename='button.css')}}">-->
 <!-- <meta http-equiv="refresh" content=10; URL="http://127.0.0.1:5000"> -->
 {% endblock %}
@@ -41,10 +41,10 @@
 <iframe  class= "frame_center" src="http://127.0.0.1:5000/mapyoyogi" width="100%" height="500" style="border-radius: 20px;"></iframe>
 </div>
 <div id="footer">
-    <a href="{{url_for('foliummap')}}">
+    <a href="{{url_for('map')}}">
         <!--urlはリンク先の関数名-->
         <button class="favorite styled"
-            type="button" onclick="loction.href='http://127.0.0.1:5000/map'">
+            type="button" >
         ログアウト
         </button></a>
     </div>
