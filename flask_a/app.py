@@ -13,36 +13,72 @@ class Post(db.Model):
     gps = db.Column(db.Integer, nullable=True)
     ins = db.Column(db.String(100))
 
+
 line = [(9,10),(9,7),(10,7),(10,11),(11,8),(11,7),(7,3),(7,5),(8,3),(5,3),(8,4),(4,1),(3,1),(2,1),(5,2),(7,8)  ,(6,5),(6,3),(6,7),(6,10),(6,9)]
+routes_num = [(5,3,1),(11,8,4,1),(9,6,7,3,1)]
+
+
+def get_gps(num):
+    posts = Post.query.all()
+    for post in posts: 
+        if post.id == num:
+            return post.gps.split(",")
+
+def get_ins(num):
+    posts = Post.query.all()
+    for post in posts: 
+        if post.id == num:
+            return post.ins
+
+
+def mk_route_txt(loc):
+    route = []
+    for route_num in routes_num:
+        route_txt = f"{get_ins(route_num[0])} : "
+        for num in route_num:
+            route_txt += str(num)
+            if num != 1:
+                route_txt += " → "
+        route.append(route_txt)
+
+    if loc == "ALL": return route
+    elif loc == "トイレA": return [route[0]]
+    elif loc == "トイレB": return [route[1]]
+    else: return [route[2]]
+        
+
 
 @app.route('/admin', methods = ["GET", "POST"])
-def route():
+def admin():
     if request.method == 'GET':
         location = "ALL"
-        return render_template('index2.html', location = location)
+        print("GET")
+        route = mk_route_txt(location)
+        return render_template('index2.html', location = location, route = route)
     
     else:
         location = request.form.get("btn", None)
         print(location)
-        return render_template('index2.html', location = location)
+        route = mk_route_txt(location)
+        return render_template('index2.html', location = location, route = route)
+
+
+
 
 @app.route('/map/<location>',methods = ["GET"])
 def foliummap(location):
     start_cords=(35.67061628919986, 139.69567437962016)
     folium_map = folium.Map(location=start_cords, zoom_start=17)
 
-    gps_group = []
-    posts = Post.query.all()
-
-    for post in posts:
-        gps_group.append(post.gps.split(","))
-
-    if location == "ゴミ箱A":
+    if location == "ALL":
         for loc in line:
-            folium.PolyLine(locations = [np.float_(gps_group[loc[0]-1]), np.float_(gps_group[loc[1]-1])], color = "gray").add_to(folium_map)
+            folium.PolyLine(locations = [np.float_(get_gps(loc[0])), np.float_(get_gps(loc[1]))], color = "gray").add_to(folium_map)
 
     folium_map.save('templates/index.html')
     return render_template('index.html')
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
