@@ -1,11 +1,11 @@
 import bluetooth
 import random
 import struct
-import time
-import binascii
+import utime
+import ubinascii
 import micropython
 
-from ble_advertising import decode_services, decode_name
+from BLE_advertising import decode_services, decode_name
 
 from micropython import const
 
@@ -41,7 +41,7 @@ _ENV_SENSE_SERVICE = (_Dev_Info_UUID,(_Dev_CHAR,),)
 def form_mac_address(addr: bytes) -> str:
     return ":".join('{:02x}'.format(b) for b in addr)
 
-class BLETemperatureCentral:
+class BLEDevCentral:
     def __init__(self, ble):
         self._ble = ble
         self._ble.active(True)
@@ -76,13 +76,17 @@ class BLETemperatureCentral:
     def _irq(self, event, data):
         if event == _IRQ_SCAN_RESULT:
             addr_type, addr, adv_type, rssi, adv_data = data
-            print('type:{} addr:{} rssi:{} data:{}'.format(addr_type, ubinascii.hexlify(addr), rssi, ubinascii.hexlify(adv_data)))
-            if adv_type in (_ADV_IND, _ADV_DIRECT_IND) and _ENV_SENSE_UUID in decode_services(adv_data):
-                # Found a potential device, remember it and stop scanning.
-                self._addr_type = addr_type
-                self._addr = bytes(addr)  # Note: addr buffer is owned by caller so need to copy it.
-                self._name = decode_name(adv_data) or "?"
-                self._ble.gap_scan(None)
+            adv = ubinascii.hexlify(adv_data)
+            adr = ubinascii.hexlify(addr)
+            if '6573703332' in adv:
+                adv = str(ubinascii.unhexlify(adv), 'utf-8')
+                print('type:{} addr:{} rssi:{} data:{}'.format(addr_type, adr, rssi, adv))    
+                if adv_type in (_ADV_IND, _ADV_DIRECT_IND) and _Dev_Info_UUID in decode_services(adv_data):
+                    # Found a potential device, remember it and stop scanning.
+                    self._addr_type = addr_type
+                    self._addr = bytes(addr)  # Note: addr buffer is owned by caller so need to copy it.
+                    self._name = adv or "?"
+                    self._ble.gap_scan(None)
 
         elif event == _IRQ_SCAN_DONE:
             print('Scan compelete')
@@ -96,12 +100,12 @@ class BLETemperatureCentral:
                     # Scan timed out.
                     self._scan_callback(None, None, None)
 
-        elif event == _IRQ_PERIPHERAL_CONNECT:
+        elif event == _IRQ_PERIPHERAL_CONNECT: #gap_connect()が成功しました。
             # Connect successful.
             conn_handle, addr_type, addr = data
             if addr_type == self._addr_type and addr == self._addr:
                 self._conn_handle = conn_handle
-                self._ble.gattc_discover_services(self._conn_handle)
+                self._ble.gattc_discover_services(self._conn_handle) #characteristicsについて問い合わせる
                 print('peripheral discovered')
 
         elif event == _IRQ_PERIPHERAL_DISCONNECT:
@@ -111,13 +115,13 @@ class BLETemperatureCentral:
                 # If it was initiated by us, it'll already be reset.
                 self._reset()
 
-        elif event == _IRQ_GATTC_SERVICE_RESULT:
+        elif event == _IRQ_GATTC_SERVICE_RESULT:#_ble.gattc_discover_servicesy結果より発生する
             # Connected device returned a service.
             conn_handle, start_handle, end_handle, uuid = data
             if conn_handle == self._conn_handle and uuid == _Dev_Info_UUID:
                 self._start_handle, self._end_handle = start_handle, end_handle
 
-        elif event == _IRQ_GATTC_SERVICE_DONE:
+        elif event == _IRQ_GATTC_SERVICE_DONE: #上のイベントの検索が完了すると発生する
             # Service query complete.
             if self._start_handle and self._end_handle:
                 self._ble.gattc_discover_characteristics(
@@ -129,7 +133,7 @@ class BLETemperatureCentral:
         elif event == _IRQ_GATTC_CHARACTERISTIC_RESULT:
             # Connected device returned a characteristic.
             conn_handle, def_handle, value_handle, properties, uuid = data
-            if conn_handle == self._conn_handle and uuid == _TEMP_UUID:
+            if conn_handle == self._conn_handle and uuid == _Dev_Name_UUID:
                 self._value_handle = value_handle
 
         elif event == _IRQ_GATTC_CHARACTERISTIC_DONE:
@@ -141,7 +145,7 @@ class BLETemperatureCentral:
             else:
                 print("Failed to find temperature characteristic.")
 
-        elif event == _IRQ_GATTC_READ_RESULT:
+        elif event == _IRQ_GATTC_READ_RESULT: #読み込みイベント
             # A read completed successfully.
             conn_handle, value_handle, char_data = data
             if conn_handle == self._conn_handle and value_handle == self._value_handle:
@@ -171,16 +175,18 @@ class BLETemperatureCentral:
         self._addr_type = None
         self._addr = None
         self._scan_callback = callback
-        self._ble.gap_scan(2000, 30000, 30000)
+        self._ble.gap_scan(7000, 6000, 6000)
 
     # Connect to the specified device (otherwise use cached address from a scan).
-    def connect(self, addr_type=None, addr=None, callback=None):
+    def connect(self, addr_type=None, addr=None, callback=None): #connect関数
         self._addr_type = addr_type or self._addr_type
         self._addr = addr or self._addr
         self._conn_callback = callback
         if self._addr_type is None or self._addr is None:
             return False
-        self._ble.gap_connect(self._addr_type, self._addr)
+        # if アドバタイズの中身が~だったら
+        #print(self._addr)
+        self._ble.gap_connect(self._addr_type, self._addr) #接続要求
         return True
 
     # Disconnect from current device.
@@ -195,7 +201,7 @@ class BLETemperatureCentral:
         if not self.is_connected():
             return
         self._read_callback = callback
-        self._ble.gattc_read(self._conn_handle, self._value_handle)
+        self._ble.gattc_read(self._conn_handle, self._value_handle) #リモート読み込み
 
     # Sets a callback to be invoked when the device notifies us.
     def on_notify(self, callback):
@@ -204,22 +210,32 @@ class BLETemperatureCentral:
     def _update_value(self, data):
         # Data is sint16 in degrees Celsius with a resolution of 0.01 degrees Celsius.
         #self._value = struct.unpack("<h", data)[0] / 100 #元の文
-        self._value = binascii.hexlify(data)
-        self._value = self._value.decode('utf-8')
+        self._value = ubinascii.hexlify(data)
+        self._value = bytes(self._value)
+        #print(self._value)
+        #self._value = self._value.decode('utf-8')
+        self._value = str(ubinascii.unhexlify(self._value), 'utf-8')
         return self._value
 
     def value(self):
         return self._value
 
 
-def demo():
+def Centr():
     ble = bluetooth.BLE()
-    central = BLETemperatureCentral(ble)
+    ble.config(gap_name='senser04')
+    set_name = ble.config('gap_name')
+    print(set_name)
+    central = BLEDevCentral(ble)
 
     not_found = False
 
-    def on_scan(addr_type, addr, name):
+    def on_scan(addr_type, addr, name): #scanのcallback
         if addr_type is not None:
+            #もし、nameがsenser01なら
+            name = ubinascii.hexlify(name)
+            addr = ubinascii.hexlify(addr)
+            name = str(ubinascii.unhexlify(name), 'utf-8')
             print("Found sensor:", addr_type, addr, name)
             central.connect()
         else:
@@ -227,11 +243,11 @@ def demo():
             not_found = True
             print("No sensor found.")
 
-    central.scan(callback=on_scan)
+    central.scan(callback=on_scan) #def scan
 
     # Wait for connection...
     while not central.is_connected():
-        time.sleep_ms(100)
+        utime.sleep_ms(100)
         if not_found:
             return
 
@@ -240,7 +256,7 @@ def demo():
     # Explicitly issue reads, using "print" as the callback.
     while central.is_connected():
         central.read(callback=print)
-        time.sleep_ms(2000)
+        utime.sleep_ms(2000)
 
     # Alternative to the above, just show the most recently notified value.
     #while central.is_connected():
@@ -251,4 +267,4 @@ def demo():
 
 
 if __name__ == "__main__":
-    demo()
+    Centr()
