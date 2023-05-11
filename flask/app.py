@@ -41,22 +41,6 @@ def login():
 
 
 """ここから管理者"""
-import folium
-from flask import Flask,render_template,request,redirect
-from folium.features import CustomIcon
-from flask_sqlalchemy import SQLAlchemy
-import numpy as np
-
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///location.db'
-db = SQLAlchemy(app) 
-
-class Post(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    gps = db.Column(db.Integer, nullable=True)
-    ins = db.Column(db.String(100))
-
-
 line_all = [(9,10),(9,7),(10,7),(10,11),(11,8),(11,7),(7,3),(7,5),(8,3),(5,3),(8,4),(4,1),(3,1),(2,1),(5,2),(7,8)  ,(6,5),(6,3),(6,7),(6,10),(6,9)]
 all_node = [2,3,4,6,7,8,10]
 routes_num = [(5,2,1),(11,8,4,1),(9,6,7,3,1)]
