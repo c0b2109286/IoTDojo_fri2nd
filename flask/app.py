@@ -147,7 +147,7 @@ def usermap():
     #text = request.form.getlist('item')
     toileta_num,toiletb_num,garbage_num=resp(text,toileta_num,toiletb_num,garbage_num)
     #print(toileta_num)
-    
+
     if request.method == 'GET':
         loca_yoyogi = "ALL"
         return render_template('index4.html',indextoa_res=toileta_num,indextob_res=toiletb_num,indexga_res=garbage_num,loca_yoyogi=loca_yoyogi)
@@ -166,7 +166,16 @@ def userfoliummap(loca_yoyogi):
     global TOILETA,GARBAGE,TOILETB
     toilet_sum=0
     start_cords=(35.67061628919986, 139.69567437962016)
-    folium_map = folium.Map(location=start_cords, zoom_start=16)
+    if loca_yoyogi=="ALL":
+        folium_map = folium.Map(location=start_cords, zoom_start=16)
+    elif loca_yoyogi=="トイレA":
+        folium_map = folium.Map(location=(35.6731505814937, 139.695854029406), zoom_start=16)
+    elif loca_yoyogi=="トイレB":
+        folium_map = folium.Map(location=(35.667735340230486, 139.69497987229343), zoom_start=16)
+    elif loca_yoyogi=="ゴミ箱A":
+        folium_map = folium.Map(location=(35.67003164502453, 139.69917334912813), zoom_start=16)
+    else:
+        folium_map = folium.Map(location=start_cords, zoom_start=16)
 
 
     gps_group = []
@@ -190,13 +199,14 @@ def userfoliummap(loca_yoyogi):
 
 
     for gps, ins in zip(gps_group, ins_group):
+        
         #print(f"どうどう{gps,ins}")
         if ins == "toileta":
             if loca_yoyogi=="ALL" or loca_yoyogi=="トイレA" :
                 if TOILETA==0 :
                     icon_image = "./image/toilet_b.png"
                 elif TOILETA==1 :
-                    icon_image = "./image/toilet_y.png"
+                    icon_image = "./image/toilet_o.png"
                 elif TOILETA==2:
                     icon_image = "./image/toilet_r.png"
             else:
@@ -206,7 +216,7 @@ def userfoliummap(loca_yoyogi):
                 if TOILETB==0 :
                     icon_image = "./image/toilet_b.png"
                 elif TOILETB==1 :
-                    icon_image = "./image/toilet_y.png"
+                    icon_image = "./image/toilet_o.png"
                 elif TOILETB==2:
                     icon_image = "./image/toilet_r.png"
             else:
@@ -217,7 +227,7 @@ def userfoliummap(loca_yoyogi):
                 if GARBAGE==0:
                     icon_image = "./image/box_b.png"
                 elif GARBAGE==1:
-                    icon_image = "./image/box_y.png"
+                    icon_image = "./image/box_o.png"
                 elif GARBAGE==2:
                     icon_image = "./image/box_r.png"
                 else:
@@ -231,24 +241,14 @@ def userfoliummap(loca_yoyogi):
         
 
 
-        if loca_yoyogi=="ALL":
-            icon = CustomIcon(
-                icon_image = icon_image
-                ,icon_size = (50, 50)
-                ,icon_anchor = (30, 30)
-                ,popup_anchor = (0, 0)
-                )
-            folium.Marker(location=gps,icon = icon).add_to(folium_map)
-        else:
-            icon = CustomIcon(
-                icon_image = icon_image
-                ,icon_size = (100, 100)
-                ,icon_anchor = (30, 30)
-                ,popup_anchor = (0, 0)
-                )
-            #print(gps)
-            folium.Marker(location=[str(float(gps[0])+0.0005),str(float(gps[1])-0.0005)],icon = icon).add_to(folium_map)
-
+        icon = CustomIcon(
+            icon_image = icon_image
+            ,icon_size = (50, 50)
+            ,icon_anchor = (30, 30)
+            ,popup_anchor = (0, 0)
+            )
+        folium.Marker(location=gps,icon = icon).add_to(folium_map)
+        
         #folium.Marker(location=gps,icon = icon).add_to(folium_map)
 
     folium_map.save('templates/index3.html')

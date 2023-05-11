@@ -38,7 +38,7 @@
     }
     
     .styled:active {
-        box-shadow: inset -2px -2px 3px rgba(255, 255, 255, 0.6), inset 2px 2px 3px rgba(0, 0, 0, 0.6);
+        box-shadow: inset -2px -2px 3px rgba(0, 0, 0, 0.6), inset 2px 2px 3px rgba(0, 0, 0, 0.6);
     }
 
     .btn_01 {
@@ -65,9 +65,23 @@
         padding: 1rem 4rem;
         font-weight: bold;
         font-size: 20px;
-        border: 2px solid #0000FF;
-        color: #0000FF;
-        background-color: rgba(0, 0, 255, 0.2);
+        border: 2px solid #7d7d7d;
+        color: #7d7d7d;
+        background-color: rgba(255, 255, 255, 0.2);
+        margin-bottom: 10px;
+    }
+    .btn_ch {
+        display: block;
+        text-align: center;
+        line-height: 80px;
+        width: 100%;
+        height: 110px;
+        padding: 1rem 4rem;
+        font-weight: bold;
+        font-size: 20px;
+        border: 2px solid #000000;
+        color: #000000;
+        background-color: rgba(0, 255, 0, 0.2);
         margin-bottom: 10px;
     }
     
@@ -80,9 +94,9 @@
         padding: 1rem 4rem;
         font-weight: bold;
         font-size: 20px;
-        border: 2px solid #FFA500;
-        color: #FFA500;
-        background-color: rgba(255, 165, 0, 0.2);
+        border: 2px solid #7d7d7d;
+        color: #7d7d7d;
+        background-color: rgba(255, 255, 255, 0.2);
         margin-bottom: 10px;
     }
     
@@ -95,9 +109,23 @@
         padding: 1rem 4rem;
         font-weight: bold;
         font-size: 20px;
-        border: 2px solid #FF18B5;
-        color: #FF18B5;
-        background-color: rgba(237, 51, 255, 0.2);
+        border: 2px solid #7d7d7d;
+        color: #7d7d7d;
+        background-color: rgba(255, 255, 255, 0.2);
         margin-bottom: 10px;
     }
     
+/*ニュース1行の周りの余白*/
+.slider a{
+    display: block;
+    background:#fff;
+    padding:20px;
+}
+
+/*日付*/
+.slider span {
+    display:inline-block;
+    font-size:0.8rem;
+    margin-right:10px;
+    color:#777;
+}
