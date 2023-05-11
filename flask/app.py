@@ -41,8 +41,25 @@ def login():
 
 
 """ここから管理者"""
-line = [(9,10),(9,7),(10,7),(10,11),(11,8),(11,7),(7,3),(7,5),(8,3),(5,3),(8,4),(4,1),(3,1),(2,1),(5,2),(7,8)  ,(6,5),(6,3),(6,7),(6,10),(6,9)]
-routes_num = [(5,3,1),(11,8,4,1),(9,6,7,3,1)]
+import folium
+from flask import Flask,render_template,request,redirect
+from folium.features import CustomIcon
+from flask_sqlalchemy import SQLAlchemy
+import numpy as np
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///location.db'
+db = SQLAlchemy(app) 
+
+class Post(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    gps = db.Column(db.Integer, nullable=True)
+    ins = db.Column(db.String(100))
+
+
+line_all = [(9,10),(9,7),(10,7),(10,11),(11,8),(11,7),(7,3),(7,5),(8,3),(5,3),(8,4),(4,1),(3,1),(2,1),(5,2),(7,8)  ,(6,5),(6,3),(6,7),(6,10),(6,9)]
+all_node = [2,3,4,6,7,8,10]
+routes_num = [(5,2,1),(11,8,4,1),(9,6,7,3,1)]
 
 
 def get_gps(num):
@@ -56,6 +73,14 @@ def get_ins(num):
     for post in posts: 
         if post.id == num:
             return post.ins
+        
+def mk_route(num):
+    for line in routes_num:
+        if line[0] == num:
+            route = []
+            for i in range(len(line)-1):
+                route.append((line[i],line[i+1]))
+    return route
 
 
 def mk_route_txt(loc):
@@ -67,7 +92,6 @@ def mk_route_txt(loc):
             if num != 1:
                 route_txt += " → "
         route.append(route_txt)
-    #print(route)
 
     if loc == "ALL": return route
     elif loc == "トイレA": return [route[0]]
@@ -87,20 +111,52 @@ def admin():
     else:
         location = request.form.get("btn", None)
         print(location)
+        if location == "ログアウト":
+            return render_template("index.html")
         route = mk_route_txt(location)
         return render_template('index2.html', location = location, route = route)
-
-
 
 
 @app.route('/map/<location>',methods = ["GET"])
 def foliummap(location):
     start_cords=(35.67061628919986, 139.69567437962016)
     folium_map = folium.Map(location=start_cords, zoom_start=17)
+    route, color, loc_num = line_all,"gray",0
+
+    for loc in line_all:
+        folium.PolyLine(locations = [np.float_(get_gps(loc[0])), np.float_(get_gps(loc[1]))], color = "gray").add_to(folium_map)
 
     if location == "ALL":
-        for loc in line:
-            folium.PolyLine(locations = [np.float_(get_gps(loc[0])), np.float_(get_gps(loc[1]))], color = "gray").add_to(folium_map)
+        for point in all_node:
+            folium.Circle(location=get_gps(point), radius=12, color = "black", fill = True).add_to(folium_map)
+
+        for set in [("blue", 5),("#FF7E00", 9), ("#FF18B5", 11)]:
+            color, loc_num = set
+            route = mk_route(loc_num)
+
+            for loc in route:
+                folium.PolyLine(locations = [np.float_(get_gps(loc[0])), np.float_(get_gps(loc[1]))], color = color).add_to(folium_map)
+
+            folium.Circle(location=get_gps(loc_num), radius=15, color = color, fill = True).add_to(folium_map)
+
+    else:
+        if location == "トイレA": color, loc_num = "blue", 5
+        elif location == "トイレB": color, loc_num = "#FF7E00", 9
+        elif location == "ゴミ箱A": color, loc_num = "#FF18B5", 11
+
+        route = mk_route(loc_num)
+
+        for loc in route:
+            folium.PolyLine(locations = [np.float_(get_gps(loc[0])), np.float_(get_gps(loc[1]))], color = color).add_to(folium_map)
+
+        for point in route[:-1]:
+            folium.Circle(location=get_gps(point[1]), radius=12, color = "black", fill = True).add_to(folium_map)
+
+        folium.Circle(location=get_gps(loc_num), radius=15, color = color, fill = True).add_to(folium_map)
+
+
+    icon = CustomIcon(icon_image = "./image/office.png", icon_size = (50, 50), icon_anchor = (25, 25), popup_anchor = (0, 0))
+    folium.Marker(location=get_gps(1),icon = icon).add_to(folium_map)
 
     folium_map.save('templates/index.html')
     return render_template('index.html')
