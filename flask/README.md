@@ -5,7 +5,7 @@
 ## Table of Contents
 
 - [ログイン画面](#Login-Screen)
-- [AdminScreen](#Admin-Screen)
+- [運営画面](#Admin-Screen)
 - [ユーザ画面](#User-Screen)
 
 ## Login Screen
@@ -15,7 +15,7 @@
 
 ### 参考文献
 
-- [とある科学の備忘録・【C++/OpenCV】動画のプレイヤーを作成する]()
+- []()
 
 
 
@@ -33,7 +33,7 @@
 ユーザ画面について説明します。
 ### 使用したクラス、関数
 
-- `PNGOverlay`: アルファチャンネルの貼り付けを行うクラス
+- `PNG`: アルファチャンネルの貼り付けを行うクラス
 
 
 ### 参考文献
