@@ -11,7 +11,7 @@
 {% block body %}
 <h1 style="text-align:center"><font size="20">ParKeeper</font></h1>
 
-<div style="padding: 10px; margin-bottom: 10px; border: 1px solid #333333;">
+<!--<div style="padding: 10px; margin-bottom: 10px; border: 1px solid #333333;">
 <ul class="slider">
     {% if loca_yoyogi=="ALL" %}
     <li><a ><font size="10">トイレAは{{indextoa_res}}人使用しました。</font></a></li>
@@ -38,7 +38,8 @@
     {%endif%}
     </ul>
 
-</div>
+
+</div>-->
   <script src="/static/js/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <script src="/static/js/jquery.bxslider.min.js"></script>
   <script src="/static/js/bxSlider.js"></script>
@@ -102,4 +103,6 @@
         ログアウト
         </button></a>
     </div>
+<h2>最終更新時刻：{{dt_now}}</h2>
+
 {% endblock %}

@@ -3,16 +3,14 @@ from flask import Flask,render_template,request,redirect
 from folium.features import CustomIcon
 from flask_sqlalchemy import SQLAlchemy
 import numpy as np
-import argparse
-from config_utils import ConfigUtils
+import datetime
+import os
 
 TOILETA=0
 GARBAGE=0
 TOILETB=0
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--config',default='config/config.yaml',type=str)
-args = parser.parse_args()
+
 
 
 app = Flask(__name__)
@@ -174,9 +172,16 @@ def resp(text,toileta_num,garbage_num,toiletb_num):
             garbage_num=int(text[2])
     return toileta_num,toiletb_num,garbage_num
 
+def datetime_now():
+    dt_now = datetime.datetime.now()
+    dt_now=dt_now.strftime('%Y年%m月%d日 %H:%M:%S')
+    return dt_now
+    #print(dt_now)
+
 @app.route('/useryoyogi',methods=['GET','POST'])
 def usermap():
     global TOILETA,GARBAGE,TOILETB
+    dt_now=datetime_now()
     toileta_num=0
     toiletb_num=0
     garbage_num=0
@@ -187,12 +192,12 @@ def usermap():
 
     if request.method == 'GET':
         loca_yoyogi = "ALL"
-        return render_template('index4.html',indextoa_res=toileta_num,indextob_res=toiletb_num,indexga_res=garbage_num,loca_yoyogi=loca_yoyogi)
+        return render_template('useryoyogi.html',indextoa_res=toileta_num,indextob_res=toiletb_num,indexga_res=garbage_num,loca_yoyogi=loca_yoyogi,dt_now=dt_now)
     
     else:
         loca_yoyogi = request.form.get("ubtn", None)
         #print(f"なぜ{loca_yoyogi}")
-        return render_template('index4.html',indextoa_res=toileta_num,indextob_res=toiletb_num,indexga_res=garbage_num,loca_yoyogi=loca_yoyogi)
+        return render_template('useryoyogi.html',indextoa_res=toileta_num,indextob_res=toiletb_num,indexga_res=garbage_num,loca_yoyogi=loca_yoyogi,dt_now=dt_now)
     
 
 
@@ -280,8 +285,8 @@ def userfoliummap(loca_yoyogi):
         
         #folium.Marker(location=gps,icon = icon).add_to(folium_map)
 
-    folium_map.save('templates/index3.html')
-    return render_template('index3.html')
+    folium_map.save('templates/yoyogimap.html')
+    return render_template('yoyogimap.html')
 
 
 
