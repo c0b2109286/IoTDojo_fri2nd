@@ -45,6 +45,7 @@
   <script src="/static/js/bxSlider.js"></script>
 
 <div style="padding: 10px; margin-bottom: 10px; border: 1px solid #333333;">
+    {% if indexga_res<100 %}
     {% if loca_yoyogi=="ALL" %}
     <font size="10">トイレAは{{indextoa_res}}人使用しました。</font><br>
     <font size="10">トイレBは{{indextob_res}}人使用しました。</font></br>
@@ -61,6 +62,26 @@
     <font size="10">トイレAは{{indextoa_res}}人使用しました。</font><br>
     <font size="10">トイレBは{{indextob_res}}人使用しました。</font></br>
     <font size="10" color="red">ゴミ箱は{{indexga_res}}%蓄積されています。</font>
+    {% endif %}
+
+    {% else %}
+    {% if loca_yoyogi=="ALL" %}
+    <font size="10">トイレAは{{indextoa_res}}人使用しました。</font><br>
+    <font size="10">トイレBは{{indextob_res}}人使用しました。</font></br>
+    <font size="10"color="red">ゴミ箱は溢れています</font>
+    {% elif loca_yoyogi=="トイレA" %}
+    <font size="10" color="red">トイレAは{{indextoa_res}}人使用しました。</font><br>
+    <font size="10">トイレBは{{indextob_res}}人使用しました。</font></br>
+    <font size="10"color="red">ゴミ箱は溢れています</font>
+    {% elif loca_yoyogi=="トイレB" %}
+    <font size="10">トイレAは{{indextoa_res}}人使用しました。</font><br>
+    <font size="10" color="red">トイレBは{{indextob_res}}人使用しました。</font></br>
+    <font size="10"color="red">ゴミ箱は溢れています</font>
+    {% elif loca_yoyogi=="ゴミ箱A" %}
+    <font size="10">トイレAは{{indextoa_res}}人使用しました。</font><br>
+    <font size="10">トイレBは{{indextob_res}}人使用しました。</font></br>
+    <font size="10" color="red">ゴミ箱は溢れています</font>
+    {% endif %}
     {% endif %}
 </div>
 <div id="left">

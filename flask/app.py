@@ -4,8 +4,6 @@ from folium.features import CustomIcon
 from flask_sqlalchemy import SQLAlchemy
 import numpy as np
 import datetime
-import os
-
 TOILETA=0
 GARBAGE=0
 TOILETB=0
@@ -165,8 +163,10 @@ def resp(text,toileta_num,garbage_num,toiletb_num):
         if text[2]!="":
             if int(text[2])>=30 and int(text[2])<70:
                 GARBAGE=1
-            elif int(text[2])>=70:
+            elif int(text[2])>=70 and int(text[2])<100:
                 GARBAGE=2
+            elif int(text[2])>=100:
+                GARBAGE=3
             else:
                 GARBAGE=0
             garbage_num=int(text[2])
@@ -257,15 +257,19 @@ def userfoliummap(loca_yoyogi):
                 icon_image = "./image/zero.png"
 
         elif ins == "box":
-            if loca_yoyogi=="ALL" or loca_yoyogi=="ゴミ箱A":
+            if loca_yoyogi=="ALL" or loca_yoyogi=="ゴミ箱A" :
                 if GARBAGE==0:
                     icon_image = "./image/box_b.png"
                 elif GARBAGE==1:
                     icon_image = "./image/box_o.png"
                 elif GARBAGE==2:
                     icon_image = "./image/box_r.png"
+                elif GARBAGE==3:
+                    pass
                 else:
                     icon_image = "./image/zero.png"
+            if GARBAGE==3:
+                icon_image = "./image/box_r.png"
         elif ins == "office":
             icon_image = "./image/zero.png"
         # else:
