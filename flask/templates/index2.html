@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>テスト</title>
+<meta name="description" content="テスト中">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/static/css/style.css">
+{% endblock %}
+
+{% block body %}
+
+<div class = "container">
+
+    <header class = "site_header">
+
+        <div class="site_header_wrapper">
+            <a class="brand">ParKeeper</a>
+        </div>
+
+        <div class="hamburger-menu">
+            <input type="checkbox" id="menu-btn-check">
+            <label for="menu-btn-check" class="menu-btn"><span></span></label>
+            <form class="menu-content" action="/admin"  method="POST">
+                <ul>
+                    <li>
+                        <input type = "submit" name = "btn" value = "ALL" class="btn_01"></input>
+                    </li>
+                    <li>
+                        <input type = "submit" name = "btn" value = "トイレA" class="btn_02"></input>
+                    </li>
+                    <li>
+                        <input type = "submit" name = "btn" value = "トイレB" class="btn_03"></input>
+                    </li>
+                    <li>
+                        <input type = "submit" name = "btn" value = "ゴミ箱A" class="btn_04"></input>
+                    </li>
+                </ul>
+            </form>
+        </div>
+
+    </header>
+    <body >
+    </body>
+
+    <div class="detail">
+        <div class="detail_txt">
+            <div class="txt_position">
+                {% for R in route %}
+                    <a>{{R}}</a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <form action="/admin" class="map_set" method="POST">
+
+        <div class="btn_map">
+            <input type = "submit" name = "btn" value = "ALL" class="btn_01"></input>
+            <input type = "submit" name = "btn" value = "トイレA" class="btn_02"></input>
+            <input type = "submit" name = "btn" value = "トイレB" class="btn_03"></input>
+            <input type = "submit" name = "btn" value = "ゴミ箱A" class="btn_04"></input>
+            <div class = "logout">
+                <a href="{{url_for('map')}}">
+                    <!--urlはリンク先の関数名-->
+                    <button class="favorite styled"
+                        type="button" >
+                    ログアウト
+                    </button></a>
+            </div>
+        </div>
+
+            <iframe class= "frame_center" src="http://127.0.0.1:5000/map/{{location}}"  style="border-radius: 20px;"></iframe>
+
+
+    </form>
+
+</div>
+{% endblock %}
