@@ -4,6 +4,7 @@ import struct
 import utime
 import ubinascii
 import micropython
+import machine
 
 from BLE_advertising import decode_services, decode_name
 
@@ -179,8 +180,15 @@ class BLEDevCentral:
         self._addr_type = None
         self._addr = None
         self._scan_callback = callback
-        self._ble.gap_scan(7000, 6000, 6000)
-
+        #self._ble.gap_scan(7000,6000,6000,False)
+        self._ble.gap_scan(0)
+        #while(True):
+        #    self._ble.gap_scan(7000,6000,6000)
+        #    utime.sleep_ms(1000)
+        
+    def not_scan(self):
+        self._ble.gap_scan(None)
+        
     # Connect to the specified device (otherwise use cached address from a scan).
     def connect(self, addr_type=None, addr=None, callback=None): #connect関数
         self._addr_type = addr_type or self._addr_type
@@ -230,6 +238,7 @@ def Centr():
     central = BLEDevCentral(ble)
 
     not_found = False
+    conect = False
 
     def on_scan(addr_type, addr, name): #scanのcallback
         if addr_type is not None:
@@ -239,13 +248,15 @@ def Centr():
             name = str(ubinascii.unhexlify(name), 'utf-8')
             print("Found sensor:", addr_type, addr, name)
             central.connect()
+            central.not_scan()
         else:
             nonlocal not_found
             not_found = True
             print("No sensor found.")
-
+            
+    
     central.scan(callback=on_scan) #def scan
-
+        
     # Wait for connection...
     while not central.is_connected():
         utime.sleep_ms(100)

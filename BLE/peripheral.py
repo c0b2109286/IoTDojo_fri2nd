@@ -68,7 +68,7 @@ class BLE:
                     # Indicate connected centrals.
                     self._ble.gatts_indicate(conn_handle, self._handle)
 
-    def _advertise(self, interval_us=500000):
+    def _advertise(self, interval_us=100000):
         self._ble.gap_advertise(interval_us, adv_data=self._payload)
 
 
@@ -85,7 +85,7 @@ def periph():
     i = 0
     count = 0
 
-    while count < 2: #2回出力
+    while count < 10: #2回出力
     #while True: #無限ループ
         # Write every second, notify every 10 seconds.
         i = (i + 1) % 10
@@ -94,6 +94,8 @@ def periph():
         print(set_name)
         time.sleep_ms(1000)
         count += 1
+    #b._advertise(None)
+    print("終了")
 
 if __name__ == "__main__":
     periph()

@@ -70,7 +70,7 @@ class BLE:
                     # Indicate connected centrals.
                     self._ble.gatts_indicate(conn_handle, self._handle)
 
-    def _advertise(self, interval_us=500000):
+    def _advertise(self, interval_us=100000):
         self._ble.gap_advertise(interval_us, adv_data=self._payload)
 
 
@@ -80,7 +80,17 @@ def periph():
     set_name = ble.config('gap_name')
     print(set_name)
     nm = central2.Centr()
+
+    print(type(nm))
     print(nm.encode())
+    print(type(nm))
+    
+    print(type(set_name))
+    set_name = set_name.decode('utf-8')
+    print(type(set_name))
+    
+    data = set_name + '_' + nm
+
     print(binascii.hexlify("esp32"))
     b = BLE(ble)
     i = 0
@@ -92,8 +102,9 @@ def periph():
         i = (i + 1) % 10
         #b.set_dev_name(set_name, notify=i == 0, indicate=False)
         b.set_dev_name(nm, notify=i == 0, indicate=False)
+        b.set_dev_name(data, notify=i == 0, indicate=False)
         ##Random walk the temperature.
-        print(nm)
+        print(data)
         time.sleep_ms(1000)
         count += 1
 
