@@ -68,40 +68,42 @@
 ## Central
 ### central.py [centralの役割をするコード]
 ### 【クラス，関数】
+- - - 
 ```python:central.py
-class BLEDevCentral 
-  def form_mac_address(addr: bytes) -> str:
-    bytes型のマックアドレスをstr型へ変換する為の関数
+def form_mac_address(addr: bytes) -> str:
+  #bytes型のマックアドレスをstr型へ変換する為の関数
+class BLEDevCentral:
+  def __init__(self,ble):
+    #初期化を行う．
   def bt_irq(event, data):
-    イベントを喚起してそれぞれ処理を定める為の関数．
+    #イベントを喚起してそれぞれ処理を定める．
   def is_connectes(self):
-    機器が別機器と接続している状況の場合に実行される関数．
+    #機器が別機器と接続している状況の場合に実行される．
   def scan(sel, callback=None):
-    機器がスキャンを行う為の関数
+    #機器がスキャンを行う．
   def connect(self, addr_type=None, addr=None, callback=None):
-    機器が接続を行う為の関数
+    #機器が接続を行う．
   def disconnect(self):
-    機器が接続を切る為の関数
+    #機器が接続を切る．
   def read(self, callback):
-    アドバタイズパケットの読み込みを行う為の関数
+    #アドバタイズパケットの読み込みを行う．
   def on_notify(self, callback):
-    通知を行う為の関数
+    #通知を行う．
   def _updata_value(self, value):
-    データをアップデートする為の関数
+    #データをアップデートする．
   def value(self):
-    データを返す為の関数
+    #データを返す．
 def Centr()
-    順にクラス内の関数を呼び出し処理を実行する為の関数
+    #順にクラス内の関数を呼び出し処理を実行する．
 ```
+- - - 
 ### 【処理】
-- ble.active(True)
-
-  BLEを起動する
-
-- ble.irq(bt_irq)
-
-  イベント処理
-
+```python:central.py
+ble.active(True)
+  #BLEを起動する
+ble.irq(bt_irq)
+  #イベント処理
+```
 - ble.gap_scan(interval_ms, interval_us, window_us,active = False,)
 
   ・スキャンを行う
