@@ -24,11 +24,9 @@ _Dev_CHAR = (bluetooth.UUID(0x2A00), bluetooth.FLAG_READ|bluetooth.FLAG_WRITE,)
   #Characteristics(UUID,FLAG)の設定
 ((self._handle,),) = self._ble.gatts_register_services((_Dev_SERVICE,))
   #指定したサービスでサーバを構成し、既存のサービスを置換
-self._payload = advertising_payload(
-        name=name, services=[_Dev_Info_UUID], appearance=0)
+self._payload = advertising_payload(name=name, services=[_Dev_Info_UUID], appearance=0)
   #from import したdef関数を用いてペイロードを作成
-self._ble.gatts_write(self._handle, 
-        struct.pack('12si',dev_name)) 
+self._ble.gatts_write(self._handle, struct.pack('12si',dev_name)) 
   #ハンドルのローカル値を書き込む
 struct.pack(fmt,value)
   #フォーマット文字列fmtにしたがって値valueをパックする
@@ -46,19 +44,22 @@ _IRQ_CENTRAL_CONNECT = const(1)
   #セントラルがこの周辺機器に接続
 _IRQ_CENTRAL_DISCONNECT = const(2)
   #セントラルがこの周辺機器から切断
-0x180A #Service/Device Infomation service
-0x2A00 #Characteristics/Device Name
+
+'0x180A' #Service/Device Infomation service
+'0x2A00' #Characteristics/Device Name
+
 FLAG_READ #ローカル値の読み取り
 FLAG_WRITE #ローカル値の書き込み
-`12si` #12→12文字, s→文字列をバイト列に変換したもの, i→整数(iは要らない？)
+
+'12si' #12→12文字, s→文字列をバイト列に変換したもの, i→整数(iは要らない？)
 ```
 
 ## Central
 ### central.py [centralの役割をするコード]
 ### 【クラス，関数】\\
-```python:central.py
+```python central.py
 def form_mac_address(addr: bytes) -> str:
-  #bytes型のマックアドレスをstr型へ変換する為の関数
+#bytes型のマックアドレスをstr型へ変換する為の関数
 class BLEDevCentral:
   def __init__(self,ble):
     #初期化を行う．
@@ -85,7 +86,7 @@ def Centr()
 ```
 
 ### 【処理】
-```python:central.py
+```python central.py
 ble.active(True)
   #BLEを起動する
 ble.irq(bt_irq)
@@ -96,7 +97,7 @@ ble.gap_scan(interval_ms, interval_us, window_us,active = False,)
   #スキャンの応答を結果として受け取りたい場合は、 active を True にする
 ```
 ### 【イベントコード/UUID】
-```python:central.py
+```python central.py
 _IRQ_SCAN_RESULT = const(5)
   #シングルスキャン結果
 _IRQ_SCAN_DONE = const(6)
