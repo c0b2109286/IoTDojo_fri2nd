@@ -22,6 +22,10 @@ class Post(db.Model):
     num_gps = db.Column(db.Integer)
     ins = db.Column(db.String(100))
     esp_name = db.Column(db.String(100))
+
+class route(db.Model):
+    id = db.Column(db.String, primary_key=True)
+    route = db.Column(db.String, nullable=True)
     
     
 """ここからログイン"""
@@ -36,36 +40,88 @@ def map():
 
 
 """ここから管理者"""
-line_all = [(9,10),(9,7),(10,7),(10,11),(11,8),(11,7),(7,5),(8,4),(4,1),(2,1),(5,2),(7,8),(6,5),(6,7),(6,10),(6,9)  ,(3,1),(7,3),(6,3),(8,3),(5,3)]
-all_node = [2,3,4,6,7,8,10]
-routes_num = [(5,3,1),(11,8,4,1),(9,7,3,1)]
+# 経路表を作成する関数
+def mk_routing_table():
+    sensor_set = set()
+    posts = route.query.all()
+    for post in posts:
+        sensor_set.add(int(post.route.split("_")[0]))
+    
+    routing_table = []
+    for i in sensor_set:
+        plus_tabele = []
+        for post in posts:
+            if int(post.route.split("_")[0]) == i:
+                if plus_tabele:
+                    if int(plus_tabele[0].split("_")[-1]) > int(post.route.split("_")[0]):
+                        plus_tabele.insert(0, post.route)
+                    else:
+                        plus_tabele.append(post.route)
+                else:
+                    plus_tabele.append(post.route)
+        routing_table.append(plus_tabele)
+    return routing_table
 
+# 経路表からデータ送信に使用する経路をリストにする関数
+def mk_routes_num():
+    routes_num = []
+    routing_table = mk_routing_table()
+    for routes in routing_table:
+        num_list = []
+        for num in routes[0].split("_")[:-1]:
+            num_list.append(int(num))
+        routes_num.append(num_list)
+    return routes_num
 
+# 黒丸を描く全てのノードをリストにする関数
+def mk_all_node():
+    posts = route.query.all()
+    num_set = set()
+    for post in posts:
+        for num in post.route.split("_")[1:-1]:
+            num_set.add(int(num))
+    return list(num_set)
+
+# ノード動詞のつながりをタプルにしてリストに入れる関数
+def mk_all_route():
+    posts = route.query.all()
+    line_set = set()
+    for post in posts:
+        for i in range(len(post.route.split("_"))-2):
+            line_set.add((int(post.route.split("_")[i]),int(post.route.split("_")[i+1])))
+    return list(line_set)
+
+#numのgpsを返答
 def get_gps(num):
     posts = Post.query.all()
     for post in posts: 
-        if post.id == num:
+        if int(post.id) == num:
             return post.gps.split(",")
 
+#numのgpsナンバーを返答
 def get_num_gps(num):
     posts = Post.query.all()
-    for post in posts: 
+    for post in posts:
         if post.id == num:
             return post.num_gps.split(",")
 
+#numのespを返答
 def get_ins(num):
     posts = Post.query.all()
     for post in posts: 
         if post.id == num:
             return post.ins
 
+#numのespの名前を返答
 def get_ins_name(num):
     posts = Post.query.all()
     for post in posts: 
         if post.id == num:
             return post.esp_name
 
+# numのセンサからのルートを返す関数
 def mk_route(num):
+    routes_num = mk_routes_num()
     for line in routes_num:
         if line[0] == num:
             route = []
@@ -75,6 +131,7 @@ def mk_route(num):
 
 def mk_route_txt(loc):
     route = []
+    routes_num = mk_routes_num()
     for route_num in routes_num:
         route_txt = f"{get_ins_name(route_num[0])} : "
         for num in route_num:
@@ -90,6 +147,7 @@ def mk_route_txt(loc):
 
 def judge_overlap():
     route_list = []
+    routes_num = mk_routes_num()
     for route in routes_num:
         route_list.append(mk_route(route[0]))
 
@@ -99,9 +157,9 @@ def judge_overlap():
             judge_num_list.append(pair[0][0][0])    
     return judge_num_list
 
-def get_timeout_node():
+def get_timeout_node(route):
     node_set = set()
-    for node_tuple in line_all:
+    for node_tuple in route:
         for node in node_tuple:
             node_set.add(node)
 
@@ -112,6 +170,8 @@ def get_timeout_node():
     
     return timeout_node_list
 
+
+#-------------------------------------------------------------
 
 @app.route('/admin', methods = ["GET", "POST"])
 def admin():
@@ -130,65 +190,116 @@ def admin():
         return render_template('index2.html', location = location, route = route)
 
 
+
+
 @app.route('/map/<location>',methods = ["GET"])
 def foliummap(location):
-    start_cords=(35.67061628919986, 139.69567437962016)
-    folium_map = folium.Map(location=start_cords, zoom_start=17)
-    timeout_node_list = get_timeout_node()
-    route, color, loc_num = line_all,"gray",0
+    ## マップ全体の決めごと
 
-    for loc in line_all:
+    start_cords=(35.67061628919986, 139.69567437962016)             #マップの中心位置
+    folium_map = folium.Map(location=start_cords, zoom_start=17)    #マップの倍率
+    route, color = mk_all_route(),"gray"                            #ルートに関する代入
+    timeout_node_list = get_timeout_node(route)                     #タイムアウトしているノードの特定
+
+    # 灰色の線を描く
+    for loc in route:
         folium.PolyLine(locations = [np.float_(get_gps(loc[0])), np.float_(get_gps(loc[1]))], color = "gray").add_to(folium_map)
 
+    # 各ノードの番号スタンプを描く
     for i in range(1,12):
         a = f"./image/num{i}.png"
-        icon = CustomIcon(icon_image = a, icon_size = (60, 55), icon_anchor = (35, 35), popup_anchor = (0, 0))
+        icon = CustomIcon(icon_image = a, icon_size = (80, 75), icon_anchor = (35, 35), popup_anchor = (0, 0))
         folium.Marker(location=get_num_gps(i),icon = icon).add_to(folium_map)
 
-    if location == "ALL":
-        judge_num_list = judge_overlap()
 
+    ## 押されたボタンがALLの場合
+    if location == "ALL":
+        # 重なっている経路がないか検索
+        judge_num_list = judge_overlap()
+        all_node = mk_all_node()
+
+        # 中継器に黒丸を描く
         for point in all_node:
             folium.Circle(location=get_gps(point), radius=12, color = "black", fill = True).add_to(folium_map)
 
+        # 各センサからの使用経路を描く
         for set in [("blue", 5),("#FF7E00", 9), ("#FF18B5", 11)]:
             color, loc_num = set
             route = mk_route(loc_num)
 
+            # 重なっている経路の片方をずらして描く
             if loc_num in judge_num_list:
                 for loc in route:
                     folium.PolyLine(locations = [np.float_(get_gps(loc[0]))*1.000001, np.float_(get_gps(loc[1]))*1.000001], color = color).add_to(folium_map)
+            
+            # その他の経路を通常通り描く
             else:
                 for loc in route:
                     folium.PolyLine(locations = [np.float_(get_gps(loc[0])), np.float_(get_gps(loc[1]))], color = color).add_to(folium_map)
+            
+            # センサの円を描く
+            folium.Circle(location=get_gps(loc_num), radius=15, color = color, fill = True).add_to(folium_map)
 
-            folium.Circle(location=get_gps(loc_num), radius=15, color = color, fill = True, ).add_to(folium_map)
-
+            # タイムアウトしたノードにバツを描く
             for node in timeout_node_list:
                 icon = CustomIcon(icon_image = "./image/batu.png", icon_size = (50, 50), icon_anchor = (25, 25), popup_anchor = (0, 0))
                 folium.Marker(location=get_gps(node),icon = icon).add_to(folium_map)
 
+
+
+
     else:
-        if location == "トイレA": color, loc_num = "blue", 5
-        elif location == "トイレB": color, loc_num = "#FF7E00", 9
-        elif location == "ゴミ箱A": color, loc_num = "#FF18B5", 11
+        if location == "トイレA": 
+            color, loc_num = "blue", 5
+        elif location == "トイレB": 
+            color, loc_num = "#FF7E00", 9
+        elif location == "ゴミ箱A": 
+            color, loc_num = "#FF18B5", 11
 
         route = mk_route(loc_num)
 
+        # 線を引く
         for loc in route:
             folium.PolyLine(locations = [np.float_(get_gps(loc[0])), np.float_(get_gps(loc[1]))], color = color).add_to(folium_map)
 
+        # 黒丸を描く
         for point in route[:-1]:
             folium.Circle(location=get_gps(point[1]), radius=12, color = "black", fill = True).add_to(folium_map)
-
+        
+        # センサーの円を描く
         folium.Circle(location=get_gps(loc_num), radius=15, color = color, fill = True).add_to(folium_map)
+
+        # タイムアウトしたノードにバツを描く
+        for node in timeout_node_list:
+            icon = CustomIcon(icon_image = "./image/batu.png", icon_size = (50, 50), icon_anchor = (25, 25), popup_anchor = (0, 0))
+            folium.Marker(location=get_gps(node),icon = icon).add_to(folium_map)
  
 
+    # サーバのアイコンを描く
     icon = CustomIcon(icon_image = "./image/office.png", icon_size = (70, 70), icon_anchor = (35, 35), popup_anchor = (0, 0))
     folium.Marker(location=get_gps(1),icon = icon).add_to(folium_map)
 
+    # 全ての変更をセーブする
     folium_map.save('templates/index.html')
     return render_template('index.html')
+
+
+
+
+
+@app.route('/data', methods=['POST'])
+def receive_data():
+    data = request.get_json()  # 受信したJSONデータを取得
+
+    ##ここで値を返す
+
+
+    # データの処理
+    # ...
+    print(data)
+    # print("Data received successfully")
+
+    return 'Data received successfully'
 
 
 """ここから利用者"""
