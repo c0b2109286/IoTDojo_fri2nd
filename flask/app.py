@@ -4,6 +4,7 @@ from folium.features import CustomIcon
 from flask_sqlalchemy import SQLAlchemy
 import numpy as np
 import datetime
+import itertools
 TOILETA=0
 GARBAGE=0
 TOILETB=0
