@@ -1,3 +1,5 @@
+#com7 central code
+
 import bluetooth
 import random
 import struct
@@ -78,8 +80,9 @@ class BLEDevCentral:
             addr_type, addr, adv_type, rssi, adv_data = data
             adv = ubinascii.hexlify(adv_data)
             adr = ubinascii.hexlify(addr)
-            if '6573703332' in adv: #esp32
-            #if '65737033322d34' in adv: #esp32-4
+            #if '65737033322d3241' in adv: #esp32-2A
+            if '65737033322d3242' in adv: #esp32-2B
+                #print(adv)
                 adv = str(ubinascii.unhexlify(adv), 'utf-8')
                 print('type:{} addr:{} rssi:{} data:{}'.format(addr_type, adr, rssi, adv))    
                 if adv_type in (_ADV_IND, _ADV_DIRECT_IND) and _Dev_Info_UUID in decode_services(adv_data):
@@ -153,10 +156,7 @@ class BLEDevCentral:
                 self._update_value(char_data)
                 if self._read_callback:
                     self._read_callback(self._value)
-                    #print("12345")
-                    #print(self._value)
-                    self._read_callback = self._value
-                    return self._read_callback
+                    self._read_callback = None
 
         elif event == _IRQ_GATTC_READ_DONE:
             # Read completed (no-op).
@@ -180,6 +180,10 @@ class BLEDevCentral:
         self._addr = None
         self._scan_callback = callback
         self._ble.gap_scan(7000, 6000, 6000)
+        #self._ble.gap_scan(0)
+    
+    def not_scan(self):
+        self._ble.gap_scan(None)
 
     # Connect to the specified device (otherwise use cached address from a scan).
     def connect(self, addr_type=None, addr=None, callback=None): #connect関数
@@ -213,10 +217,13 @@ class BLEDevCentral:
 
     def _update_value(self, data):
         # Data is sint16 in degrees Celsius with a resolution of 0.01 degrees Celsius.
+        #self._value = struct.unpack("<h", data)[0] / 100 #元の文
         self._value = ubinascii.hexlify(data)
         self._value = bytes(self._value)
+        #print(self._value)
+        #self._value = self._value.decode('utf-8')
         self._value = str(ubinascii.unhexlify(self._value), 'utf-8')
-        return self._value #ここでscan内容出力
+        return self._value
 
     def value(self):
         return self._value
@@ -229,9 +236,11 @@ def Centr():
     print(set_name)
     central = BLEDevCentral(ble)
 
+    ble_devices = []
+
     not_found = False
 
-    def on_scan(addr_type, addr, name): #scanのcallback
+    def on_scan(addr_type, addr, name): #scanのcallback #ここでconnect呼び出ししてる
         if addr_type is not None:
             #もし、nameがsenser01なら
             name = ubinascii.hexlify(name)
@@ -239,12 +248,18 @@ def Centr():
             name = str(ubinascii.unhexlify(name), 'utf-8')
             print("Found sensor:", addr_type, addr, name)
             central.connect()
+            central.not_scan()
         else:
             nonlocal not_found
             not_found = True
             print("No sensor found.")
 
     central.scan(callback=on_scan) #def scan
+
+    while len(ble_devices) > 0:
+        device = ble_devices.pop(0)
+        device.central.connect()
+        device.central.disconnect()
 
     # Wait for connection...
     while not central.is_connected():
@@ -255,18 +270,17 @@ def Centr():
     print("Connected")
 
     # Explicitly issue reads, using "print" as the callback.
-    count = 0
-    while count < 3:
+    while central.is_connected():
         central.read(callback=print)
-        print("#####")
         utime.sleep_ms(2000)
-        count += 1
-        print(count)
-    senser = central._read_callback
-    print(senser)
-    central.disconnect()
+
+    # Alternative to the above, just show the most recently notified value.
+    #while central.is_connected():
+    #    print(central.value())
+    #    time.sleep_ms(2000)
+
     print("Disconnected")
-    return senser
+
 
 if __name__ == "__main__":
     Centr()
