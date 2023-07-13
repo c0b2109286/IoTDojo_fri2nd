@@ -36,11 +36,32 @@ class Sensor(db.Model):
     
     
 """ここからログイン"""
-@app.route('/',methods=['GET','POST'])
-def map():
-    text = request.form.getlist('username')
-    print(text)
+# データベースモデルの定義
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(255), unique=True, nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+# ログインページの表示
+@app.route('/login')
+def login():
     return render_template('login.html')
+
+# ログインの処理
+@app.route('/login_post', methods=['POST'])
+def login_post():
+    username = request.form['username']
+    password = request.form['password']
+    
+    # ユーザーの認証
+    user = User.query.filter_by(username=username, password=password).first()
+    
+    if user:
+        # ログイン成功時の処理（例：メインページにリダイレクト）
+        return redirect(url_for('main'))
+    else:
+        # ログイン失敗時の処理（例：エラーメッセージの表示）
+        error = 'Invalid username or password'
+        return render_template('login.html', error=error)
 
 
     
