@@ -293,13 +293,21 @@ def foliummap(location):
 
 
 
-
 @app.route('/data', methods=['POST'])
 def receive_data():
     data = request.get_json()  # 受信したJSONデータを取得
 
     ##ここで値を返す
 
+
+    # route.dbに値を入れる
+    id = db.Column(db.String, primary_key=True)
+    route = db.Column(db.String, nullable=True)
+        
+    new_post = route(id=id, route = route)
+
+    db.session.add(new_post)
+    db.session.commit()
 
     # データの処理
     # ...
