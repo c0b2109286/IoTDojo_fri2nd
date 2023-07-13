@@ -36,6 +36,7 @@ class Sensor(db.Model):
     
     
 """ここからログイン"""
+
 # データベースモデルの定義
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -62,6 +63,11 @@ def login_post():
         # ログイン失敗時の処理（例：エラーメッセージの表示）
         error = 'Invalid username or password'
         return render_template('login.html', error=error)
+
+# メインページの表示
+@app.route('/main')
+def main():
+    return 'Welcome to the main page!'
 
 
     
@@ -314,21 +320,13 @@ def foliummap(location):
 
 
 
+
 @app.route('/data', methods=['POST'])
 def receive_data():
     data = request.get_json()  # 受信したJSONデータを取得
 
     ##ここで値を返す
 
-
-    # route.dbに値を入れる
-    id = db.Column(db.String, primary_key=True)
-    route = db.Column(db.String, nullable=True)
-        
-    new_post = route(id=id, route = route)
-
-    db.session.add(new_post)
-    db.session.commit()
 
     # データの処理
     # ...
@@ -564,14 +562,7 @@ def userfoliummap(loca_yoyogi):
 
 
 
-# @app.route('/delete')
-# def delete():
-#     posts = Post.query.all()
 
-#     for post in posts:
-#         db.session.delete(post)
-#         db.session.commit()
-#     return redirect('/create')
 
 
 
