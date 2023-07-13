@@ -1,9 +1,9 @@
 import folium
-from flask import Flask,render_template,request,redirect
+from flask import Flask,render_template,request,redirect,url_for
 from folium.features import CustomIcon
 from flask_sqlalchemy import SQLAlchemy
 import numpy as np
-import datetime
+from datetime import datetime
 import itertools
 TOILETA=0
 GARBAGE=0
@@ -27,6 +27,12 @@ class Post(db.Model):
 class route(db.Model):
     id = db.Column(db.String, primary_key=True)
     route = db.Column(db.String, nullable=True)
+
+class Sensor(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    val = db.Column(db.String(100))
+    date = db.Column(db.String(100))
+    time = db.Column(db.String(100))
     
     
 """ここからログイン"""
@@ -306,6 +312,7 @@ def receive_data():
 """ここから利用者"""
 
 def resp(text,toileta_num,garbage_num,toiletb_num):
+    #print(f"これが知りたいのさ{text,toileta_num,garbage_num,toiletb_num}")
     global TOILETA,GARBAGE,TOILETB
     if text!=[]and text[0]!="":
         if int(text[0])>=50 and int(text[0])<100:
@@ -325,6 +332,8 @@ def resp(text,toileta_num,garbage_num,toiletb_num):
         toiletb_num=int(text[1])
     if len(text)>=2:
         if text[2]!="":
+            text[2]=str(round(int(text[2])/4))
+            #print(f"これが知りたいのさ２{text[2]}")
             if int(text[2])>=30 and int(text[2])<70:
                 GARBAGE=1
             elif int(text[2])>=70 and int(text[2])<100:
@@ -337,37 +346,104 @@ def resp(text,toileta_num,garbage_num,toiletb_num):
     return toileta_num,toiletb_num,garbage_num
 
 def datetime_now():
-    dt_now = datetime.datetime.now()
-    dt_now=dt_now.strftime('%Y年%m月%d日 %H:%M:%S')
+    sensors=Sensor.query.all()
+    sensors_datetime=[sensors[0].date+sensors[0].time,sensors[1].date+sensors[1].time,sensors[2].date+sensors[2].time]
+    date_string=max(sensors_datetime)
+    # 日付と時間をパース
+    dt = datetime.strptime(date_string, "%Y%m%d%H%M%S")
+
+    # 日付と時間を所望の形式で出力
+    dt_now = dt.strftime("%Y年%m月%d日%H時%M分%S秒")
+    
     return dt_now
     #print(dt_now)
+    
+def reset_toilet(resetlis,text,reseta,resetb):
+    sensors = Sensor.query.all() # idでエントリを取得
+    if resetlis[0]!=[]:
+        #PARA[0]=str(int(PARA[0])-int(reseta))
+        for sensor in sensors:
+            if sensor.id =="1":
+                reseta=sensors[0].val
+                #sensors[0].val="0"
 
-@app.route('/useryoyogi',methods=['GET','POST'])
+                
+        #text[0]="0"
+    if resetlis[1]!=[]:
+        #PARA[1]=str(int(PARA[1])-int(resetb))
+        for sensor in sensors:
+            if sensor.id =="2":
+                resetb=sensors[1].val
+                #sensors[1].val="0"
+                
+        #text[1]="0"
+    #print(f"textlis={text}")
+    #resetlis=[[], [], '']
+    db.session.commit()  # データベースに変更をコミット
+    sensors=Sensor.query.all()
+    for sensor in sensors:
+        if sensor.id =="1":
+            sensor_vals1=sensor.val
+        elif sensor.id =="2":
+            sensor_vals2=sensor.val
+        elif sensor.id =="3":
+            sensor_vals3=sensor.val
+    text=[sensor_vals1,sensor_vals2,sensor_vals3]
+    return text,resetlis,reseta,resetb
+
+
+@app.route('/',methods=['GET','POST'])
 def usermap():
-    global TOILETA,GARBAGE,TOILETB
+    global TOILETA,GARBAGE,TOILETB,PARA,RESETA,RESETB
     dt_now=datetime_now()
     toileta_num=0
     toiletb_num=0
     garbage_num=0
-    text=["0","70","100"]
+    sensors=Sensor.query.all()
+
+    for sensor in sensors:
+        if sensor.id =="1":
+            #print(f"お試し：id: {sensor.id}, val: {sensor.val}, date: {sensor.date}, time: {sensor.time}")
+            sensor_vals1=sensor.val
+            #print(sensor_vals1)
+        elif sensor.id =="2":
+            sensor_vals2=sensor.val
+        elif sensor.id =="3":
+            sensor_vals3=sensor.val
+        print(f"id: {sensor.id}, val: {sensor.val}, date: {sensor.date}, time: {sensor.time}")
+    PARA=[sensor_vals1,sensor_vals2,sensor_vals3]
+    #print(f"例えば君が{PARA}")
+    reset = [request.form.getlist('reseta'),request.form.getlist('resetb'),request.form.get('resetp')]
+    PARA,reset,reseta,resetb=reset_toilet(reset,PARA,reseta=0,resetb=0)
+    PARA[0]=str(int(PARA[0])-int(reseta))
+    PARA[1]=str(int(PARA[1])-int(resetb))
+    print(f"例えば君が{PARA,reseta,resetb}")
+    print(f"なぜこうなった{reset}")
+    #print(f"へぇ{reset,PARA}")
     #text = request.form.getlist('item')
-    toileta_num,toiletb_num,garbage_num=resp(text,toileta_num,toiletb_num,garbage_num)
+    toileta_num,toiletb_num,garbage_num=resp(PARA,toileta_num,toiletb_num,garbage_num)
     #print(toileta_num)
+    
 
     if request.method == 'GET':
         loca_yoyogi = "ALL"
         return render_template('useryoyogi.html',indextoa_res=toileta_num,indextob_res=toiletb_num,indexga_res=garbage_num,loca_yoyogi=loca_yoyogi,dt_now=dt_now)
     
     else:
-        loca_yoyogi = request.form.get("ubtn", None)
+        if request.form.get("ubtn", None) != None:
+            loca_yoyogi = request.form.get("ubtn", None)
+        else:
+            loca_yoyogi="ALL"
         #print(f"なぜ{loca_yoyogi}")
         return render_template('useryoyogi.html',indextoa_res=toileta_num,indextob_res=toiletb_num,indexga_res=garbage_num,loca_yoyogi=loca_yoyogi,dt_now=dt_now)
     
 
+@app.route('/#info-1',methods=['GET','POST'])
+def resetmap():
+    #print("Hey")
+    usermap()
 
-
-
-@app.route('/mapyoyogi/<loca_yoyogi>',methods = ["GET"])
+@app.route('/<loca_yoyogi>',methods = ["GET"])
 def userfoliummap(loca_yoyogi):
     global TOILETA,GARBAGE,TOILETB
     toilet_sum=0
@@ -379,7 +455,7 @@ def userfoliummap(loca_yoyogi):
     gps_group = []
     ins_group = []
     posts = Post.query.all()
-    #print(f"どうどう{posts}")
+    #print(f"どうどう{posts[0]}")
 
     for post in posts:
         #print(f"どうどう{db.Model}")
@@ -455,6 +531,7 @@ def userfoliummap(loca_yoyogi):
 
     folium_map.save('templates/yoyogimap.html')
     return render_template('yoyogimap.html')
+
 
 
 
