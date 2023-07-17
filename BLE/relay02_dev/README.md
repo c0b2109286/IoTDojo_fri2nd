@@ -1,0 +1,1 @@
+device type : relay02
