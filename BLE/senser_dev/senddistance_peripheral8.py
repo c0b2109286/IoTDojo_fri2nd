@@ -85,11 +85,11 @@ class BLE:
     def _advertise_2(self, interval_us=500000):
         self._ble.gap_advertise(interval_us, adv_data=self._payload_2)
 
-    #def _stop(self, interval_us):
-    #    self._ble.gap_advertise(interval_us, adv_data=self._payload)
+    def _stop(self, interval_us):
+        self._ble.gap_advertise(interval_us)
 
 
-def periph(distance,timeout=10):
+def periph(distance,timeout):
     
     i = 0
     flag = 0
@@ -173,6 +173,7 @@ def periph(distance,timeout=10):
         print("conected")
         print(data)
 
+    b._stop()
     print("終了")
 
 if __name__ == "__main__":
