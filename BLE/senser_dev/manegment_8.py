@@ -43,16 +43,20 @@ class Management():
         
     def getdistance(self):
         distance = get.distance()
+        print("#####")
+        print(type(distance)) #int
+        distance = str(distance)
+        print(type(distance)) #str
         return distance
         
     def SenserdataSend(self,distance):
-        senddistance_peripheral.periph(str(distance))
+        senddistance_peripheral.periph(distance,5
 
 if __name__ == "__main__":
     mg = Management()
-    data = mg._RoutedataSend()
-    route = mg._RoutedataGet()
+    #data = mg._RoutedataSend()
+    #route = mg._RoutedataGet()
     #mg._RoutedataWrite(data)
     #mg._MakeRouteTable()
-    #distance = mg.getdistance()
-    #mg.SenserdataSend(distance)
+    distance = mg.getdistance()
+    mg.SenserdataSend(distance)
