@@ -179,7 +179,7 @@ class BLEDevCentral:
         self._addr_type = None
         self._addr = None
         self._scan_callback = callback
-        self._ble.gap_scan(0)
+        self._ble.gap_scan(0,70000,70000)
         
     def not_scan(self):
         self._ble.gap_scan(None)

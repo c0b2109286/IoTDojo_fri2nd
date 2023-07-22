@@ -180,7 +180,7 @@ class BLEDevCentral:
         self._addr = None
         self._scan_callback = callback
         #self._ble.gap_scan(7000,6000,6000,False)
-        self._ble.gap_scan(0)
+        self._ble.gap_scan(0,70000,70000)
         #while(True):
         #    self._ble.gap_scan(7000,6000,6000)
         #    utime.sleep_ms(1000)
