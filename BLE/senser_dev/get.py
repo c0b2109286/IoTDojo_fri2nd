@@ -16,12 +16,12 @@ def distance():
     #while True:
     if count is 0:
         distance = distance.read()
-        print(type(distance))
+        #print(type(distance))
         time.sleep_ms(1000)
         #distance.read()
         count += 1
     print("range: mm ", distance)
-    #return distance
+    return distance
 
 if __name__ == "__main__":
     distance()
