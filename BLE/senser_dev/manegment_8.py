@@ -50,7 +50,7 @@ class Management():
         return distance
         
     def SenserdataSend(self,distance):
-        senddistance_peripheral.periph(distance,5
+        senddistance_peripheral.periph(distance,10)
 
 if __name__ == "__main__":
     mg = Management()
