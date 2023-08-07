@@ -5,6 +5,8 @@ from flask_sqlalchemy import SQLAlchemy
 import numpy as np
 from datetime import datetime
 import itertools
+import socket
+import re
 TOILETA=0
 GARBAGE=0
 TOILETB=0
