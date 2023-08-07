@@ -218,9 +218,6 @@ def get_timeout_node(route):
     
     return timeout_node_list
 
-def db_up():
-    posts = Post.query.all()
-
 #-------------------------------------------------------------
 
 @app.route('/admin', methods = ["GET", "POST"])
@@ -373,6 +370,11 @@ def send_to_esp():
     client_socket.connect((ESP32_IP, PORT))
     client_socket.send(MESSAGE.encode())
     client_socket.close()
+
+
+
+
+
 
 """ここから利用者"""
 
