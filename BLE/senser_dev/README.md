@@ -14,12 +14,12 @@ I2C通信のSCLピン（クロック）とSDAピン（データ）を指定し�
 
 ```python senser_dev/get_s1.py
 def distance():
-  #距離センサーであるVL53L1Xのインスタンスを作成して初期化する．
+  # 距離センサーであるVL53L1Xのインスタンスを作成して初期化する．
   センサーは20mmから400mmまでの範囲で距離を測定可能，
   distance = VL53L1X(i2c)
-  #count = 0 #count 変数を定義して初期値を0に設定する．
+  # count = 0 #count 変数を定義して初期値を0に設定する．
 
-  #count が0の場合、距離センサーから距離データを読み取り，その後、1秒待機する．
+  # count が0の場合、距離センサーから距離データを読み取り，その後、1秒待機する．
   if count is 0: 
     distance = distance.read()
     time.sleep_ms(1000)
