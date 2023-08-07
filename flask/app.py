@@ -339,28 +339,38 @@ def foliummap(location):
     return render_template('index.html')
 
 
-
-
-
 @app.route('/data', methods=['POST','GET'])
 def receive_data():
     data = request.get_json()  # 受信したJSONデータを取得
 
-    ##ここで値を返す
-    
+    a = re.findall(r"\d+", data)
+    if int(a[0] <= 11):
 
-    # route.dbに値を入れる
-    new_post = route(route = data)
+        # route.dbに値を入れる
+        new_post = route(route = data)
 
-    db.session.add(new_post)
-    db.session.commit()
+        db.session.add(new_post)
+        db.session.commit()
 
-    # データの処理
-    print(data)
-
-    # print("Data received successfully")
+        # データの処理
+        print(data)
 
     return 'Data received successfully'
+
+
+
+
+@app.route('/send_to_esp', methods=['GET'])
+def send_to_esp():
+    ESP32_IP = "192.168.2.102"  # 例: '192.168.1.100'
+    PORT = 1234
+    MESSAGE = mk_routing_table()
+
+    # TCP接続
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect((ESP32_IP, PORT))
+    client_socket.send(MESSAGE.encode())
+    client_socket.close()
 
 """ここから利用者"""
 
