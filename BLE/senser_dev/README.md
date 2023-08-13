@@ -105,7 +105,7 @@ _makeval関数にて作成したリストを参考に辞書のキーとなる二
 
 ```python senser_dev/makeroute_s1.py
   def _dict(self, split, val, key):
-          dic = OrderedDict()
+          dic = OrderedDict() #順序付き辞書の作成
           for i in range(len(key)):
               if i == 0:
                   dic.update(OrderedDict(zip(key[i], val[i])))
