@@ -1,4 +1,4 @@
-# CSS説明
+# レイアウトの説明だってばよ
 ## 目次
 - [button.css](#buttoncss)
 - [login.css](#logincss)
