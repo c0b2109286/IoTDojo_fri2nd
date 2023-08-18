@@ -34,8 +34,8 @@ VL53L1Xセンサーを初期化し、一度だけ距離を読み取って表示�
 ### Overview
 受け取った経路データを用いて経路表を作成する．  
 import file : 
-[makeroute_data.txt](https://github.com/c0b2107561/dojo_Pvt./blob/main/senser_dev/data/makeroutedata_s1.txt) /
-[packet_table.json](https://github.com/c0b2107561/dojo_Pvt./blob/main/senser_dev/data/packet_table.json)
+[makeroute_data.txt](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/data/makeroutedata_s1.txt) /
+[packet_table.json](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/data/packet_table.json)
 
 ### Code
 ```python senser_dev/makeroute_s1.py
@@ -147,3 +147,84 @@ if __name__ == "__main__":
     _routemake()
 ```
 main関数を呼び出し，経路表を作成する．
+
+## [manegment_s1.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/manegment_s1.py)
+### Overview
+センサデバイスの動作を統括する．   
+import file : 
+[routedata_peripherals1](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/routedata_peripherals1.py) /
+[routeget_centrals1](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/routeget_central_s1.py) / 
+[senddistance_peripherals1](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/senddistance_peripherals1.py) / 
+[makeroute_s1](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/makeroute_s1.py) / 
+[get_s1](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/get_s1.py)
+
+### Code
+```python senser_dev/manegment_s1.py
+def nameinfo():
+    dev_name = 8 #デバイス名
+    return dev_name
+def packetinfo():
+    dev_packet = "esp32-1A" #パケット名
+    return dev_packet
+def positioninfo():
+    dev_position = "senser01" #役割名
+    return dev_position
+```
+デバイスの基本情報を定義する．  
+`用途`
+> デバイス名...　各デバイスの判別，経路データ．  
+>パケット名...　受け取るデータの選別．  
+>役割名...　経路表のkey → 経路選択．
+
+``` python senser_dev/manegment_s1.py
+class Management():
+        
+    def _RoutedataSend(self):
+        routedata_peripherals1.periph()
+        
+    def _RoutedataGet(self):
+        routedata = routeget_centrals1.Centr()
+        return routedata
+        
+    def _RoutedataWrite(self,route):
+        with open('data/makeroute_data.txt','w',encoding='utf-8')as f:
+            print(route)
+            print(type(route))
+            f.write(str(route))
+        f.close()
+
+    #def _chack(self):
+        #with open('data/makeroute_data.txt',"r",encoding='utf-8')as f:
+        #    print(f.read())
+        #f.close()
+```
+Manegmentクラスを定義して経路データの送受信と書き込み(，確認)を行う各モジュールを呼び出す関数を定義する．  
+
+`関数により呼び出されるモジュール(importファイル)と用途`  
+> _RoutedataSend... データに自身のデバイス名と追加し，中継器のホップ数をカウントすることで作成されるデータを通信経路データとし，サーバを終点としてデータを送信する．
+> _RoutedataGet... サーバで加工(経路の優先順位を追加)された経路表作成用のデータを受け取る．
+> _RoutedataWrite... 経路表作成の為に取得したデータをテキストファイルに書き込み，保存する．
+> _check... 確認用
+
+``` python senser_dev/manegment_s1.py    
+    def _MakeRouteTable(self):
+        #with open("data/makeroute_data.txt",'r',encoding="utf-8")as f:
+        #    f.read()
+        #f.close()
+        makeroute_s1._routemake()
+```
+経路表を作成するモジュールを呼び出す関数
+
+``` python senser_dev/manegment_s1.py
+    def getdistance(self):
+        distance = get_s1.distance()
+        print("#####")
+        print(distance) #ここで絶対にstrにしておく
+        print(type(distance))
+        distance = str(distance)
+        print(type(distance))
+        return distance
+        
+    def SenserdataSend(self,distance):
+        senddistance_peripherals1.periph(distance,10)
+```
