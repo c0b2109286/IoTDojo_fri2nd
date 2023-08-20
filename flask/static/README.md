@@ -6,12 +6,11 @@
 - [style.css](#stylecss)
 - [userstyle.css](#userstylecss)
 - [9-6-3.js](#9-6-3js)
-- [bxSlider.js](#bxSlider.js)
-- [jquery-3.4.1.min.js](#jquery-3.4.1.min.js)
-- [jquery.bxslider.min.js](#jquery.bxslider.min.js)
-- [jquery.cookie.js](#jquery.cookie.js)
-- [modaalmin.js](#modaalmin.js)
-
+- [bxSlider.js](#bxsliderjs)
+- [jquery-3.4.1.min.js](#jquery-341minjs)
+- [jquery.bxslider.min.js](#jquerybxsliderminjs)
+- [jquery.cookie.js](#jquerycookiejs)
+- [modaalmin.js](#modaalminjs)
 
 ## CSS ファイルの説明
 
