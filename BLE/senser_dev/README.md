@@ -46,7 +46,7 @@ def positioninfo():
 
 
 
-## [routdata_peripherals1.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/routedata_peripherals1.py)
+## [routedata_peripherals1.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/routedata_peripherals1.py)
 ### Overview
 サーバへの通信時に経由する機器の名前を取得し，中継した機器の数と共にデータを送信する．  
 import file : 
@@ -88,4 +88,32 @@ elif event == _IRQ_CENTRAL_DISCONNECT:
     self._advertise()
 elif event == _IRQ_GATTS_INDICATE_DONE:
     conn_handle, value_handle, status = data
+```
+## [routeget_centrals1.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/routeget_centrals1.py)
+### Overview
+サーバから送られてくる通信経路表を作成する為のデータを取得するコード
+import file : 
+[BLE_advertising](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/BLE_advertising.py) /
+[manegement_s1](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/manegement_s1.py)
+
+- handle  
+  BLE機器との通信においてリソースや属性を識別，管理する為の識別子．  
+  > _comm_handle : 接続ハンドル(接続中のデバイスを特定するため)  
+  > _start_handle / _end_handle :  
+  サービスに関連付けされた属性(キャラクタリスティック)の範囲を識別．  
+  > _value_handle : 特定の属性の値にアクセスするための識別子．  
+  (データの読み取り/通知の受信)
+
+### Code
+
+```python senser_dev/routeget_centrals1.py
+count = 0
+while count < 3:
+    # BLEデバイスからのデータを読み取り、print関数をコールバックとして指定
+    central.read(callback=print)  
+    print("#####")
+    utime.sleep_ms(2000)
+    count += 1
+    print(count)
+
 ```
