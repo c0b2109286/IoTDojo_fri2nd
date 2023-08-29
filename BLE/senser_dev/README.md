@@ -53,7 +53,7 @@ import file :
 [BLE_advertising](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/BLE_advertising.py) /
 [manegement_s1](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/manegement_s1.py) 
 
-- UUID
+- UUID  
   BLEデバイスやサービスを識別するための一意の識別子．
 
 ### Code
