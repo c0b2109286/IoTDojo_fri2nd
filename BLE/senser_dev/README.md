@@ -43,12 +43,7 @@ def positioninfo():
 
 - 関数により呼び出されるモジュール(importファイル)と用途
 
-|関数|ファイル|詳細|
-|:---|:---|:---|
-|_RoutedataSend|routedata_peripherals1.py|データに自身のデバイス名と追加し，中継器のホップ数をカウントすることで作成されるデータを通信経路データとし，サーバを終点としてデータを送信する．|
-|_RoutedataGet|routeget_centrals1.py|サーバで加工(経路の優先順位を追加)された経路表作成用のデータを受け取る．|
-|_RoutedataWrite|×|経路表作成の為に取得したデータをテキストファイルに書き込み，保存する．|
-|_check|×|確認用|  
+
 
 
 ## [routdata_peripherals1.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/routedata_peripherals1.py)
