@@ -3,6 +3,7 @@ from collections import OrderedDict
 
 class RouteMake:
     def _readtxt(self):
+        # テキストファイルからデータを読み込んでlistにする.
         split = []
         with open("data/makeroute_data.txt",'r',encoding="utf-8")as f:
             data = f.readlines()
@@ -22,6 +23,7 @@ class RouteMake:
             return split
         
     def _makeval(self,split):
+        # JSONファイルから値を取得して二重リストを作成する.
         with open("data/packet_table.json", 'r', encoding="utf-8") as f:
             table= ujson.load(f)
             print("@@@@@")
@@ -44,6 +46,7 @@ class RouteMake:
             return lis
 
     def _makekey(self, lis):
+        # _makeval関数にて作成したリストから辞書のキーとなる二重リストを作成する．
         print("$$$$$$$$$")
         _lis = []
         for i in range(len(lis)):
@@ -58,13 +61,15 @@ class RouteMake:
         return _lis
 
     def _dict(self,split, val, key):
+        # _makeval関数と_makekey関数によって作成したリストを用いて辞書を生成する．
         print("##########")
         print(val)
         print(key)
+        dic = OrderedDict() #順序付き辞書の作成
         for i in range(len(key)):
             print(key[0])
             if i is 0:
-                dic= OrderedDict(zip(key[i],val[i]))
+                dic.update(OrderedDict(zip(key[i],val[i])))
                 print(dic)
                 print("&&&&&")
                 hopnum = split[i][-2]
@@ -84,6 +89,7 @@ class RouteMake:
         return dic
     
     def _json(self, dic):
+        # _dict関数によって作成したリストをJSONファイルに書き込む．
         with open('data/routeinfo.json','w',encoding="utf-8") as f:
             num = len(dic)
             print(num)
@@ -91,7 +97,7 @@ class RouteMake:
             ujson.dump(dic,f)
 
 
-def _routemake():
+def _routemake(): #main関数
     rm = RouteMake()
     split = rm._readtxt()
     val = rm._makeval(split)
