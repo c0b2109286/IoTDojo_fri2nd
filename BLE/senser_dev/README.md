@@ -98,14 +98,15 @@ import file :
 
 - handle  
   BLE機器との通信においてリソースや属性を識別，管理する為の識別子．  
-  > _comm_handle : 接続ハンドル(接続中のデバイスを特定するため)  
-  > _start_handle / _end_handle :  
+  > ・_comm_handle : 接続ハンドル(接続中のデバイスを特定するため)  
+  > ・_start_handle / _end_handle :  
   サービスに関連付けされた属性(キャラクタリスティック)の範囲を識別．  
-  > _value_handle : 特定の属性の値にアクセスするための識別子．  
+  > ・_value_handle : 特定の属性の値にアクセスするための識別子．  
   (データの読み取り/通知の受信)
 
 ### Code
-
+機器からデータを読み取り，そのデータをprint関数をcallackとして使用する．  
+適切に処理する為にカスタムコールバック関数が用いられる．
 ```python senser_dev/routeget_centrals1.py
 count = 0
 while count < 3:
