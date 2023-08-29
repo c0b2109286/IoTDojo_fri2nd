@@ -45,37 +45,39 @@ def form_mac_address(addr: bytes) -> str:
 
 class BLEDevCentral:
     def __init__(self, ble):
+        # BLEデバイスのセントラル（中央）としての初期化を行います。
         self._ble = ble
-        self._ble.active(True)
-        self._ble.irq(self._irq)
+        self._ble.active(True)  # BLEを有効にします。
+        self._ble.irq(self._irq)  # BLEの割り込みハンドラーを設定します。
 
+        # 内部状態のリセットを行います。
         self._reset()
 
     def _reset(self):
-        # Cached name and address from a successful scan.
-        self._name = None
-        self._addr_type = None
-        self._addr = None
+        # 成功したスキャンからのキャッシュされた名前とアドレス。
+        self._name = None  # デバイス名
+        self._addr_type = None  # アドレスタイプ
+        self._addr = None  # アドレス
 
-        # Cached value (if we have one)
+        # キャッシュされた値（あれば）
         self._value = None
 
-        # Callbacks for completion of various operations.
-        # These reset back to None after being invoked.
-        self._scan_callback = None
-        self._conn_callback = None
-        self._read_callback = None
+        # 各種操作の完了時のコールバック関数。
+        # これらは呼び出された後にNoneにリセットされます。
+        self._scan_callback = None  # スキャン完了時のコールバック
+        self._conn_callback = None  # 接続完了時のコールバック
+        self._read_callback = None  # 読み込み完了時のコールバック
 
-        # Persistent callback for when new data is notified from the device.
+        # デバイスからの新しいデータ通知のための永続的なコールバック関数。
         self._notify_callback = None
 
-        # Connected device.
-        self._conn_handle = None
-        self._start_handle = None
-        self._end_handle = None
-        self._value_handle = None
+        # 接続されたデバイス情報
+        self._conn_handle = None  # 接続ハンドル
+        self._start_handle = None  # 開始ハンドル
+        self._end_handle = None  # 終了ハンドル
+        self._value_handle = None  # 値ハンドル
 
-    def _irq(self, event, data):
+def _irq(self, event, data):
         if event == _IRQ_SCAN_RESULT:
             addr_type, addr, adv_type, rssi, adv_data = data
             adv = ubinascii.hexlify(adv_data)
@@ -85,71 +87,71 @@ class BLEDevCentral:
                 adv = str(ubinascii.unhexlify(adv), 'utf-8')
                 print('type:{} addr:{} rssi:{} data:{}'.format(addr_type, adr, rssi, adv))    
                 if adv_type in (_ADV_IND, _ADV_DIRECT_IND) and _Dev_Info_UUID in decode_services(adv_data):
-                    # Found a potential device, remember it and stop scanning.
+                    # 潜在的なデバイスが見つかり、スキャンを停止します。
                     self._addr_type = addr_type
-                    self._addr = bytes(addr)  # Note: addr buffer is owned by caller so need to copy it.
+                    self._addr = bytes(addr)  # 注意: addrバッファは呼び出し元の所有物なので、コピーする必要があります。
                     self._name = adv or "?"
                     self._ble.gap_scan(None)
 
         elif event == _IRQ_SCAN_DONE:
-            print('Scan compelete')
+            print('スキャンが完了しました')
             if self._scan_callback:
                 if self._addr:
-                    # Found a device during the scan (and the scan was explicitly stopped).
+                    # スキャン中にデバイスが見つかりました（およびスキャンが明示的に停止されました）。
                     self._scan_callback(self._addr_type, self._addr, self._name)
-                    print("callbask is:", self._scan_callback)
+                    print("コールバックは:", self._scan_callback)
                     self._scan_callback = None
                 else:
-                    # Scan timed out.
+                    # スキャンがタイムアウトしました。
                     self._scan_callback(None, None, None)
 
         elif event == _IRQ_PERIPHERAL_CONNECT: #gap_connect()が成功しました。
-            # Connect successful.
+            # 接続成功。
             conn_handle, addr_type, addr = data
             if addr_type == self._addr_type and addr == self._addr:
                 self._conn_handle = conn_handle
                 self._ble.gattc_discover_services(self._conn_handle) #characteristicsについて問い合わせる
-                print('peripheral discovered')
+                print('ペリフェラルが見つかりました')
 
         elif event == _IRQ_PERIPHERAL_DISCONNECT:
-            # Disconnect (either initiated by us or the remote end).
+            # 切断（自分自身またはリモートエンドから開始）。
             conn_handle, _, _ = data
             if conn_handle == self._conn_handle:
-                # If it was initiated by us, it'll already be reset.
+                # それが私たちによって開始された場合、既にリセットされています。
                 self._reset()
 
         elif event == _IRQ_GATTC_SERVICE_RESULT:#_ble.gattc_discover_servicesy結果より発生する
-            # Connected device returned a service.
+            # 接続されたデバイスがサービスを返しました。
             conn_handle, start_handle, end_handle, uuid = data
             if conn_handle == self._conn_handle and uuid == _Dev_Info_UUID:
                 self._start_handle, self._end_handle = start_handle, end_handle
 
         elif event == _IRQ_GATTC_SERVICE_DONE: #上のイベントの検索が完了すると発生する
-            # Service query complete.
+            # サービスクエリが完了しました。
             if self._start_handle and self._end_handle:
                 self._ble.gattc_discover_characteristics(
                     self._conn_handle, self._start_handle, self._end_handle
                 )
             else:
-                print("Failed to find environmental sensing service.")
+                print("環境センシングサービスが見つかりませんでした。")
 
         elif event == _IRQ_GATTC_CHARACTERISTIC_RESULT:
-            # Connected device returned a characteristic.
+            # 接続されたデバイスがキャラクタリスティックを返しました。
             conn_handle, def_handle, value_handle, properties, uuid = data
             if conn_handle == self._conn_handle and uuid == _Dev_Name_UUID:
                 self._value_handle = value_handle
 
         elif event == _IRQ_GATTC_CHARACTERISTIC_DONE:
-            # Characteristic query complete.
+            # キャラクタリスティッククエリの完了。
             if self._value_handle:
-                # We've finished connecting and discovering device, fire the connect callback.
+                # 接続およびデバイスの検出が完了したら、接続コールバックを実行します。
                 if self._conn_callback:
                     self._conn_callback()
             else:
-                print("Failed to find temperature characteristic.")
+                print("温度キャラクタリスティックが見つかりませんでした。")
 
         elif event == _IRQ_GATTC_READ_RESULT: #読み込みイベント
-            # A read completed successfully.
+            # 読み込みが正常に完了しました。
             conn_handle, value_handle, char_data = data
             if conn_handle == self._conn_handle and value_handle == self._value_handle:
                 self._update_value(char_data)
@@ -161,108 +163,122 @@ class BLEDevCentral:
                     return self._read_callback
 
         elif event == _IRQ_GATTC_READ_DONE:
-            # Read completed (no-op).
+            # 読み込みが完了しました（無効な操作）。
             conn_handle, value_handle, status = data
 
         elif event == _IRQ_GATTC_NOTIFY:
-            # The ble_temperature.py demo periodically notifies its value.
+            # ble_temperature.pyデモは定期的に通知します。
             conn_handle, value_handle, notify_data = data
             if conn_handle == self._conn_handle and value_handle == self._value_handle:
                 self._update_value(notify_data)
                 if self._notify_callback:
                     self._notify_callback(self._value)
 
-    # Returns true if we've successfully connected and discovered characteristics.
-    def is_connected(self):
-        return self._conn_handle is not None and self._value_handle is not None
+# 接続およびキャラクタリスティックを正常に検出した場合にTrueを返します。
+def is_connected(self):
+    return self._conn_handle is not None and self._value_handle is not None
 
-    # Find a device advertising the environmental sensor service.
-    def scan(self, callback=None):
-        self._addr_type = None
-        self._addr = None
-        self._scan_callback = callback
-        self._ble.gap_scan(0)
-        
-    def not_scan(self):
-        self._ble.gap_scan(None)
-        
-    # Connect to the specified device (otherwise use cached address from a scan).
-    def connect(self, addr_type=None, addr=None, callback=None): #connect関数
-        self._addr_type = addr_type or self._addr_type
-        self._addr = addr or self._addr
-        self._conn_callback = callback
-        if self._addr_type is None or self._addr is None:
-            return False
-        self._ble.gap_connect(self._addr_type, self._addr) #接続要求
-        return True
+# 環境センサーサービスを広告しているデバイスを検出します。
+def scan(self, callback=None):
+    self._addr_type = None
+    self._addr = None
+    self._scan_callback = callback
+    self._ble.gap_scan(0)
 
-    # Disconnect from current device.
-    def disconnect(self):
-        if not self._conn_handle:
-            return
-        self._ble.gap_disconnect(self._conn_handle)
-        self._reset()
+# スキャンを停止します。
+def not_scan(self):
+    self._ble.gap_scan(None)
 
-    # Issues an (asynchronous) read, will invoke callback with data.
-    def read(self, callback):
-        if not self.is_connected():
-            return
-        self._read_callback = callback
-        self._ble.gattc_read(self._conn_handle, self._value_handle) #リモート読み込み
+# 指定したデバイスに接続します（それ以外の場合、スキャンからキャッシュされたアドレスを使用します）。
+def connect(self, addr_type=None, addr=None, callback=None):
+    self._addr_type = addr_type or self._addr_type
+    self._addr = addr or self._addr
+    self._conn_callback = callback
+    if self._addr_type is None or self._addr is None:
+        return False
+    self._ble.gap_connect(self._addr_type, self._addr) # 接続要求
+    return True
 
-    # Sets a callback to be invoked when the device notifies us.
-    def on_notify(self, callback):
-        self._notify_callback = callback
+# 現在のデバイスから切断します。
+def disconnect(self):
+    if not self._conn_handle:
+        return
+    self._ble.gap_disconnect(self._conn_handle)
+    self._reset()
 
-    def _update_value(self, data):
-        # Data is sint16 in degrees Celsius with a resolution of 0.01 degrees Celsius.
-        self._value = ubinascii.hexlify(data)
-        print(type(self._value))
-        #self._value = bytes(self._value)
-        self._value = ubinascii.unhexlify(self._value)
-        print(type(self._value))
-        self._value = self._value.replace(b'\x00',b'').decode('utf-8')
-        #self._value = self._value.strip()
-        return self._value
+# 読み取り要求を発行し、データをコールバックで取得します。
+def read(self, callback):
+    if not self.is_connected():
+        return
+    self._read_callback = callback
+    self._ble.gattc_read(self._conn_handle, self._value_handle) # リモート読み込み
 
-    def value(self):
-        return self._value
+# デバイスから通知を受信したときに呼び出すコールバックを設定します。
+def on_notify(self, callback):
+    self._notify_callback = callback
+
+# データを更新し、データがSint16（16ビットの整数）で、分解能が0.01度セルシウスの温度データである場合に使用します。
+def _update_value(self, data):
+    # データはSint16で、温度データは0.01度セルシウスの分解能を持っています。
+    self._value = ubinascii.hexlify(data)
+    print(type(self._value))
+    #self._value = bytes(self._value)
+    self._value = ubinascii.unhexlify(self._value)
+    print(type(self._value))
+    self._value = self._value.replace(b'\x00',b'').decode('utf-8')
+    #self._value = self._value.strip()
+    return self._value
+
+# 現在の値を返します。
+def value(self):
+    return self._value
 
 
 def Centr():
+    # Bluetooth Low Energy（BLE）のインスタンスを作成します。
     ble = bluetooth.BLE()
+    
+    # BLEデバイス用の中央（Central）クラスを作成します。
     central = BLEDevCentral(ble)
 
+    # デバイスが見つからないフラグを初期化します。
     not_found = False
-    conect = False
-            
 
-    def on_scan(addr_type, addr, name): #scanのcallback
+    # 接続が成功したフラグを初期化します。
+    connected = False
+
+    # BLEデバイスのスキャン結果を処理するコールバック関数
+    def on_scan(addr_type, addr, name): # スキャンのコールバック
         if addr_type is not None:
-            #もし、nameがsenser01なら
+            # デバイス名が"senser01"の場合
             name = ubinascii.hexlify(name)
             addr = ubinascii.hexlify(addr)
             name = str(ubinascii.unhexlify(name), 'utf-8')
-            print("Found sensor:", addr_type, addr, name)
+            print("デバイスを発見しました:", addr_type, addr, name)
+            
+            # デバイスに接続します。
             central.connect()
+            
+            # スキャンを停止します。
             central.not_scan()
         else:
+            # デバイスが見つからなかった場合
             nonlocal not_found
             not_found = True
-            print("No sensor found.")
-            
-    
-    central.scan(callback=on_scan) #def scan
+            print("デバイスが見つかりませんでした.")
+
+    # デバイスのスキャンを開始します。
+    central.scan(callback=on_scan)
         
-    # Wait for connection...
+    # 接続待ち...
     while not central.is_connected():
         utime.sleep_ms(100)
         if not_found:
             return
 
-    print("Connected")
+    print("接続成功")
 
-    # Explicitly issue reads, using "print" as the callback.
+    # データの読み取りを明示的に実行し、"print"をコールバックとして使用します。
     count = 0
     while count < 3:
         central.read(callback=print)
@@ -270,10 +286,15 @@ def Centr():
         utime.sleep_ms(2000)
         count += 1
         print(count)
+    
+    # ルートデータを取得します。
     routedata = central._read_callback
     print(routedata)
+    
+    # 接続を切断します。
     central.disconnect()
-    print("Disconnected")
+    print("切断しました")
+    
     return routedata
 
 if __name__ == "__main__":
