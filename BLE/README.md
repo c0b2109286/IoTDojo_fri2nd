@@ -7,9 +7,9 @@
 中継器として`relay01_dev`から受信したデータをサーバへ送信する．
 ### [senser_dev](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev)
 送信機としてセンサーでデータを取得したり，取得データを`relay01_dev`へ送信したりする．  
-また，経路データから経路表の作成をします．
+また，経路データから経路表の作成を行う．
 ### [demo_server](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/demo_server)
-Flaskサーバを立ち上げ，`relay02_dev`からデータを受け取る．  
+Flaskサーバを立ち上げ，`relay02_dev`からデータを受け取る．
 また，データをテンプレートのhtml`view.html`に埋め込むことでwebページとして閲覧が可能となる．
 ## MindMap
 <img src="png/mindmap.png" width="700">
@@ -17,34 +17,38 @@ Flaskサーバを立ち上げ，`relay02_dev`からデータを受け取る．
 ## BLE通信 役割
 各機器の動作は主に機器間におけるBLE通信によるデータの送受信であり，特定の機器ではデータの計測やサーバへのデータの送受信が行われる．  
 - Peripheral(ペリフェラル)  
-親機(送信側)としての動作，`～peripheral`と名の付くpythonファイル．  
+親機(送信側)としての動作，`～peripheral`と名の付くファイルが該当．  
 - Central(セントラル)  
-子機(受信側)としての動作，`～central`と名の付くpythonファイル．  
+子機(受信側)としての動作，`～central`と名の付くファイルが該当．  
 - Get  
-センサモジュールを用いて距離データの取得を行う，`get`と名の付くpythonファイル．  
+モジュールを用いて距離データの取得を行う，`get`と名の付くファイルが該当．  
 - Makeroute  
-経路表の作成を行う，`makeroute`と名の付くpythonファイル．
+経路表の作成を行う，`makeroute`と名の付くpythonが該当．
 - Manegement  
-1デバイスで順々に行われる動作を統括する． `manegement`と名の付くpythonファイル． 
+1デバイスで順々に行われる動作を統括する． `manegement`と名の付くファイルが該当． 
 
 ## 詳細
 各役割において共通する動作が多い．それぞれを抜粋して説明を行う．
 ### 1, Peripheral  
-[routedata_peripherals1.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/routedata_peripherals1.py)
 #### Overview
+
 1, サーバへの通信時に経由する機器の名前を取得し，中継した機器の数と共にデータを送信する．  
-import file : 
+2, センサモジュールで取得した距離データを経路表に則り，サーバまで送信する．  
+
+該当file：
+[routedata_peripherals1.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/routedata_peripherals1.py) / 
+[senddistance_peripherals1.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/senddistance_peripherals1.py) / [routedata_peripheral01.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/relay01_dev/routedata_peripheral01.py) / 
+[senddistance_peripheral01.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/relay01_dev/senddistance_peripheral01.py)  
+主な import file : 
 [BLE_advertising](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/BLE_advertising.py) /
 [manegement_s1](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/manegement_s1.py) 
-
-- UUID  
-  BLEデバイスやサービスを識別するための一意の識別子．
 
 #### Code
 - def _payload_1() / def _payload_2()  
 機器がアドバタイズを行う際のペイロードを作成し，それを設定する．  
-_payload_1 : パケットのペイロード(データ部分)を格納する変数．  
-> ペイロードにはデバイス名とサービスUUIDを含む．
+_payload_1 : パケットのペイロード(データ部分)を格納する変数．
+- ペイロードにはデバイス名とサービスUUIDを含む．
+> UUID : BLEデバイスやサービスを識別するための一意の識別子．
 ``` python senser_dev/routedata_peripherals1.py
 def _payload_1(self, name):
     self._name = name
@@ -76,18 +80,22 @@ elif event == _IRQ_GATTS_INDICATE_DONE:
 
 
 ### 2, Central
-[routeget_centrals1.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/routeget_centrals1.py)
 #### Overview
-サーバから送られてくる通信経路表を作成する為のデータを取得するコード
-import file : 
+サーバから送られてくる通信経路表を作成する為のデータを取得する.  
+該当file : 
+[routeget_centrals1.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/routeget_centrals1.py) / 
+[routedata_central01.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/relay01_dev/routedata_central01.py) / 
+[senddistance_central01.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/relay01_dev/senddistance_central01.py) / 
+[routedata_central02.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/relay02_dev/routedata_central02.py) / 
+[senddistance_central02.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/relay02_dev/senddistance_central02.py)  
+主な import file : 
 [BLE_advertising](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/BLE_advertising.py) /
 [manegement_s1](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/manegement_s1.py)
 
 - handle  
-  BLE機器との通信においてリソースや属性を識別，管理する為の識別子．  
+  BLE機器との通信でリソースや属性(キャラクタリスティック)を識別，管理する為の識別子  
   > ・_comm_handle : 接続ハンドル(接続中のデバイスを特定するため)  
-  > ・_start_handle / _end_handle :  
-  サービスに関連付けされた属性(キャラクタリスティック)の範囲を識別．  
+  > ・_start_handle / _end_handle : サービスに関連付けされた属性の範囲を識別．  
   > ・_value_handle : 特定の属性の値にアクセスするための識別子．  
   (データの読み取り/通知の受信)
 
@@ -112,29 +120,38 @@ def Centr():
         count += 1
         print(count)
 ```
-> binascii.hexlify は、バイナリデータを16進数文字列に変換する関数です．これにより、バイナリデータを人間が読み取りやすい形式に変換できます．  binascii.unhexlify はその逆の処理を行います。16進数文字列をバイナリデータに戻します．16進数文字列からバイナリデータへの変換を行うために使用されます．  
+> binascii.hexlify は、バイナリデータを16進数文字列に変換する関数です．これにより、バイナリデータを人間が読み取りやすい形式に変換できます．  
+> binascii.unhexlify はその逆の処理を行います。16進数文字列をバイナリデータに戻します．  16進数文字列からバイナリデータへの変換を行うために使用されます．  
 
 ### 3, Get
-送信機の役割を持つデバイス用のコード．センサーでのデータ収集と送信などを行う．
-[get_s1.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/get_s1.py)
 #### Overview
+送信機の役割を持つデバイス用のコード．センサーでのデータ収集と送信などを行う．  
 距離センサによって距離(mm)を計測し，結果をreturnする．  
-import file: [vl53l1x](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/vl53l1x.py)
+該当 file : 
+[get_s1.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/get_s1.py) / 
+主な import file: [vl53l1x](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/vl53l1x.py)
+#### Code  
+`get_s1.py`のコメントアウトに記載．
 
 
 ### 4, Makeroute
-[makeroute_s1.py](https://github.com/c0b2107561/dojo_Pvt./blob/main/senser_dev/makeroute_s1.py)
 #### Overview
 受け取った経路データを用いて経路表を作成する．  
-import file : 
+該当 file : 
+[makeroute_s1.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/makeroute_s1.py) / 
+[makeroute_01.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/relay01_dev/makeroute_01.py)
+主な import file : 
 [makeroute_data.txt](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/data/makeroutedata_s1.txt) /
 [packet_table.json](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/data/packet_table.json)
-
+#### Code
+`makeroute_s1.py`のコメントアウトに記載．
 
 ### 5, Manegement
-[manegment_s1.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/manegment_s1.py)
 #### Overview
-センサデバイスの動作を統括する．   
+センサデバイスの動作を統括する．  
+該当 file : 
+[manegment_s1.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/manegment_s1.py)
+
 import file : 
 [routedata_peripherals1](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/routedata_peripherals1.py) /
 [routeget_centrals1](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/routeget_central_s1.py) / 
