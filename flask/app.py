@@ -342,8 +342,8 @@ def foliummap(location):
 def receive_data():
     data = request.get_json()  # 受信したJSONデータを取得
 
-    a = re.findall(r"\d+", data)
-    if int(a[0] <= 11):
+    dtci = re.findall(r"\d+", data)
+    if int(dtci[0] <= 11):
 
         # route.dbに値を入れる
         new_post = route(route = data)
@@ -351,11 +351,9 @@ def receive_data():
         db.session.add(new_post)
         db.session.commit()
 
-        # データの処理
-        print(data)
-
-    return 'Data received successfully'
-
+        posts = Post.query.all()
+        if len(posts) == 11:
+            redirect("http://192.168.2.115/send_to_esp")
 
 
 
