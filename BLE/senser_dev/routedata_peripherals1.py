@@ -116,7 +116,7 @@ def periph(timeout=60):
 
     if b._check is True:
         connect_count += 1
-        print(f"connection{connect_count}")
+        print(f"connection : {connect_count}")
             
     if timeout == 0 and connect_count > 2:
         b._payload_2(jf_load[packet_name])
