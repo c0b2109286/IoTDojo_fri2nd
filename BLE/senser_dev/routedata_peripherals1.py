@@ -88,8 +88,8 @@ def periph(timeout=60):
     
     # gapname = manegement_s1.nameinfo()
     jf_open = open('info/SN01.json', 'r')
-    jf_load = jsn.load(jf_open)
-    gapname = jf_load[device_number]
+    jf_load = json.load(jf_open)
+    gapname = jf_load["device_number"]
     
     ble.config(gap_name=str(gapname))
     set_name = ble.config('gap_name')
@@ -106,7 +106,7 @@ def periph(timeout=60):
     connect_count = 0
 
     if b._check is False:
-        b._payload_1(jf_load[packet_name])
+        b._payload_1(jf_load["packet_name"])
         while timeout > 0:
             i = (i + 1) % 10
             b.set_dev_name(data, notify=i == 0, indicate=False)
