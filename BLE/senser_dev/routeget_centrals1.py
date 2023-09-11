@@ -190,7 +190,7 @@ def scan(self, callback=None):
     self._addr_type = None
     self._addr = None
     self._scan_callback = callback
-    self._ble.gap_scan(0)
+    self._ble.gap_scan(60000)
 
 # スキャンを停止します。
 def not_scan(self):
@@ -212,6 +212,7 @@ def disconnect(self):
         return
     self._ble.gap_disconnect(self._conn_handle)
     self._reset()
+    self._ble.gap_scan(60000)
 
 # 読み取り要求を発行し、データをコールバックで取得します。
 def read(self, callback):
@@ -240,6 +241,11 @@ def _update_value(self, data):
 def value(self):
     return self._value
 
+def stop(self):
+    if not self._conn_handle:
+        return
+    self._ble.gap_disconnect(self._conn_handle)
+    self._reset()
 
 def Centr():
     # Bluetooth Low Energy（BLE）のインスタンスを作成します。
@@ -300,7 +306,16 @@ def Centr():
     
     # 接続を切断します。
     central.disconnect()
-    print("切断しました")
+    print("切断しました．再接続します")
+    
+    # def _RoutedataWrite(self,route): # 経路表作成用データの保存
+    with open('data/makeroute_data.txt','w',encoding='utf-8')as f:
+        print(routedata)
+        print(type(routedata))
+        f.write(str(routedata))
+        f.close()
+
+    
     
     return routedata
 
