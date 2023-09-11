@@ -1,5 +1,5 @@
 {
-  "device_number" = "5"
-  "senser_name" = "1"
-  "packet_name" = "esp32_senser1"
+  "device_number" : "5",
+  "senser_name" : "1",
+  "packet_name" : "esp32_senser1"
 }
