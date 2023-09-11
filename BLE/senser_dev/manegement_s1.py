@@ -25,12 +25,12 @@ class Management():
         routedata = routeget_centrals1.Centr()
         return routedata
         
-    def _RoutedataWrite(self,route): # 経路表作成用データの保存
-        with open('data/makeroute_data.txt','w',encoding='utf-8')as f:
-            print(route)
-            print(type(route))
-            f.write(str(route))
-        f.close()
+    # def _RoutedataWrite(self,route): # 経路表作成用データの保存
+    #     with open('data/makeroute_data.txt','w',encoding='utf-8')as f:
+    #         print(route)
+    #         print(type(route))
+    #         f.write(str(route))
+    #     f.close()
 
     def _chack(self):
         with open('data/makeroute_data.txt',"r",encoding='utf-8')as f:
