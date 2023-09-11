@@ -83,12 +83,7 @@ class BLE:
     def _stop(self, interval_us=None):
         self._ble.gap_advertise(interval_us, adv_data=self._payload_2)
 
-json_file = open('test.json', 'r')
-json_object = json.load(json_file)
-
-print(json_object["hobby"][1])
-
-def periph(timeout=10):
+def periph(timeout=60):
     ble = bluetooth.BLE()
     
     # gapname = manegement_s1.nameinfo()
@@ -111,16 +106,20 @@ def periph(timeout=10):
     connect_count = 0
 
     if b._check is False:
-        b._payload_1("com8")
+        b._payload_1(jf_load[packet_name])
         while timeout > 0:
             i = (i + 1) % 10
             b.set_dev_name(data, notify=i == 0, indicate=False)
             print(".")
             utime.sleep_ms(1000)
             timeout -=1
+
+    if b._check is True:
+        connect_count += 1
+        print(f"connection{connect_count}")
             
-    if timeout == 0:
-        b._payload_2("com8")
+    if timeout == 0 and connect_count > 2:
+        b._payload_2(jf_load[packet_name])
         b.set_dev_name(data, notify=i == 0, indicate=False)
         print("終了")
         
