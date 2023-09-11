@@ -119,7 +119,7 @@ def periph(timeout=60):
         print(f"connection : {connect_count}")
             
     if timeout == 0 and connect_count > 2:
-        b._payload_2(jf_load[packet_name])
+        b._payload_2(jf_load["packet_name"])
         b.set_dev_name(data, notify=i == 0, indicate=False)
         print("終了")
         
