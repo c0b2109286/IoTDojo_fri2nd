@@ -186,11 +186,11 @@ def is_connected(self):
     return self._conn_handle is not None and self._value_handle is not None
 
 # 環境センサーサービスを広告しているデバイスを検出します。
-def scan(self, callback=None):
+def scan(self, callback=None, scantime):
     self._addr_type = None
     self._addr = None
     self._scan_callback = callback
-    self._ble.gap_scan(60000)
+    self._ble.gap_scan(scantime)
 
 # スキャンを停止します。
 def not_scan(self):
@@ -212,7 +212,6 @@ def disconnect(self):
         return
     self._ble.gap_disconnect(self._conn_handle)
     self._reset()
-    self._ble.gap_scan(60000)
 
 # 読み取り要求を発行し、データをコールバックで取得します。
 def read(self, callback):
@@ -260,6 +259,8 @@ def Centr():
     # 接続が成功したフラグを初期化します。
     connected = False
 
+    connect_count = 0
+
     # BLEデバイスのスキャン結果を処理するコールバック関数
     def on_scan(addr_type, addr, name): # スキャンのコールバック
         if addr_type is not None:
@@ -281,7 +282,10 @@ def Centr():
             print("デバイスが見つかりませんでした.")
 
     # デバイスのスキャンを開始します。
-    central.scan(callback=on_scan)
+    if connect_count = 0:
+        central.scan(callback=on_scan, 0)
+    else :
+        central.scan(callback=on_scan, 60000)
         
     # 接続待ち...
     while not central.is_connected():
@@ -306,6 +310,8 @@ def Centr():
     
     # 接続を切断します。
     central.disconnect()
+    connect_count += 1
+    print(connect_count)
     print("切断しました．再接続します")
     
     # def _RoutedataWrite(self,route): # 経路表作成用データの保存
@@ -315,8 +321,6 @@ def Centr():
         f.write(str(routedata))
         f.close()
 
-    
-    
     return routedata
 
 if __name__ == "__main__":
