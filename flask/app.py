@@ -7,6 +7,7 @@ from datetime import datetime
 import itertools
 import socket
 import re
+import sqlite3
 TOILETA=0
 GARBAGE=0
 TOILETB=0
