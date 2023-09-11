@@ -4,6 +4,9 @@ import senddistance_central01
 import senddistance_peripheral01
 import makeroute_01
 import ubinascii
+from machine import Timer
+import micropython,time
+
 
 # def nameinfo():
 #     dev_name = 1
@@ -16,8 +19,9 @@ import ubinascii
 #     return dev_position
 
 class Management():
-    
     def _RoutedataGet(self):
+        global stop
+        stop = True
         get = routedata_central01.Centr()
         return get
         
@@ -53,13 +57,23 @@ class Management():
         senddistance_peripheral01.periph(str(distance))
 
 if __name__ == "__main__":
-    print(ubinascii.hexlify('com8'))
+    connection = 0
+    stop = False
+    SEND = True
     mg = Management()
-    #routedata = mg._RoutedataGet()
-    #mg._RoutedataSend(routedata)
-    #mg._check()
-    #route_data = mg._RoutedataCatch()
-    #mg._MakeRouteTable()
+    
+    while SEND is True and connection < 3:
+        if stop == True:
+            break
+        routedata = mg._RoutedataGet()
+        mg._RoutedataSend(routedata)
+        connection += 1
+    timer = Timer(0)
+    routedata = timer.init(mode=Timer.ONE_SHOT, period=3000, callback = mg._RoutedataCatch())
+    
+    # route_data = mg._RoutedataCatch()
+    
+    mg._MakeRouteTable()
     distance = mg.SenserdataGet()
     mg.SenserdataSend(distance)
 
