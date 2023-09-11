@@ -79,7 +79,11 @@ class BLEDevCentral:
             addr_type, addr, adv_type, rssi, adv_data = data
             adv = ubinascii.hexlify(adv_data)
             adr = ubinascii.hexlify(addr)
-            if '636f6d38' in adv: #com8
+            jf_open = open('info/SN01.json', 'r')
+            jf_load = json.load(jf_open)
+            packet = jf_load["device_number"]
+            if '6573703332' in adv: #esp32
+                
                 adv = str(ubinascii.unhexlify(adv), 'utf-8')
                 print('type:{} addr:{} rssi:{} data:{}'.format(addr_type, adr, rssi, adv))    
                 if adv_type in (_ADV_IND, _ADV_DIRECT_IND) and _Dev_Info_UUID in decode_services(adv_data):
