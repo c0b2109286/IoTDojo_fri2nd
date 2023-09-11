@@ -4,7 +4,9 @@ import struct
 import utime
 import binascii
 from BLE_advertising import advertising_payload
-import manegement_s1
+# import manegement_s1
+import info 
+import json
 
 from micropython import const
 
@@ -81,9 +83,19 @@ class BLE:
     def _stop(self, interval_us=None):
         self._ble.gap_advertise(interval_us, adv_data=self._payload_2)
 
+json_file = open('test.json', 'r')
+json_object = json.load(json_file)
+
+print(json_object["hobby"][1])
+
 def periph(timeout=10):
     ble = bluetooth.BLE()
-    gapname = manegement_s1.nameinfo()
+    
+    # gapname = manegement_s1.nameinfo()
+    jf_open = open('info/SN01.json', 'r')
+    jf_load = jsn.load(jf_open)
+    gapname = jf_load[device_number]
+    
     ble.config(gap_name=str(gapname))
     set_name = ble.config('gap_name')
     print(set_name)
