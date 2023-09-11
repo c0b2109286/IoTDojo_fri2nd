@@ -8,6 +8,8 @@ import time
 import binascii
 from BLE_advertising import advertising_payload
 import get_s1
+import info
+import json
 
 from micropython import const
 
@@ -95,9 +97,13 @@ def periph(distance, timeout):
     flag = 0
     data = None
     name = None
+
+    jf_open = open('info/SN01.json', 'r')
+    jf_load = jsn.load(jf_open)
+    gapname = jf_load[device_number]
     
     ble = bluetooth.BLE()
-    ble.config(gap_name='8')
+    ble.config(gap_name= gapname)
     set_name = ble.config('gap_name')
     b = BLE(ble, name)
     
