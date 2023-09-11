@@ -4,15 +4,15 @@ import senddistance_peripherals1
 import makeroute_s1
 import get_s1
 
-def nameinfo():
-    dev_name = 8 # デバイス名
-    return dev_name
-def packetinfo():
-    dev_packet = "esp32-1A" # パケット名
-    return dev_packet
-def positioninfo():
-    dev_position = "senser01" # 用途
-    return dev_position
+# def nameinfo():
+#     dev_name = 8 # デバイス名
+#     return dev_name
+# def packetinfo():
+#     dev_packet = "esp32-1A" # パケット名
+#     return dev_packet
+# def positioninfo():
+#     dev_position = "senser01" # 用途
+#     return dev_position
 
 class Management():
     # センサデバイスの行う動作を纏めたクラス.
