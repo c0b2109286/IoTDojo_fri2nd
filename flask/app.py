@@ -351,9 +351,44 @@ def receive_data():
         db.session.add(new_post)
         db.session.commit()
 
-        posts = Post.query.all()
-        if len(posts) == 11:
-            redirect("http://192.168.2.115/send_to_esp")
+        # データの処理
+        print(data)
+        
+    else:
+        dtci[0]=str(int(dtci[0])-11)
+        print(f"吉野の担当：{dtci}")
+        
+        import time
+
+        # 現在のローカル時間を取得
+        local_time = time.localtime()
+
+        # 年月日と時間を整形
+        formatted_date = time.strftime("%Y%m%d", local_time)
+        formatted_hour = time.strftime("%H%M%S", local_time)
+
+        # リストに格納
+        rea = [formatted_date, formatted_hour]
+        
+        # データベースへの接続（データベースが存在しない場合は新規作成）
+        conn = sqlite3.connect("./instance/location.db")
+        # カーソルオブジェクトの作成
+        c = conn.cursor()
+        
+        
+        # 同じIDのデータがすでに存在する場合、それを削除
+        c.execute("DELETE FROM sensor WHERE id = ?", (dtci[1],))
+
+        # 新しいデータを挿入
+        c.execute("INSERT INTO sensor VALUES (?, ?, ?, ?)", (dtci[1], dtci[2], rea[0], rea[1]))
+
+        # 変更をコミット（保存）
+        conn.commit()
+        
+        # 接続を閉じる
+        conn.close()
+
+    return 'Data received successfully'
 
 
 
@@ -400,11 +435,11 @@ def resp(text,toileta_num,garbage_num,toiletb_num):
             text[2]=str(round(int(text[2])/4))
             #print(f"これが知りたいのさ２{text[2]}")
             if int(text[2])>=30 and int(text[2])<70:
-                GARBAGE=1
+                GARBAGE=3
             elif int(text[2])>=70 and int(text[2])<100:
                 GARBAGE=2
             elif int(text[2])>=100:
-                GARBAGE=3
+                GARBAGE=1
             else:
                 GARBAGE=0
             garbage_num=int(text[2])
@@ -431,6 +466,10 @@ def reset_toilet(resetlis,text,reseta,resetb):
             if sensor.id =="1":
                 reseta=sensors[0].val
                 #sensors[0].val="0"
+    # else:
+    #     for sensor in sensors:
+    #         if sensor.id =="1":
+    #             sensors[0].val=str(int(PARA[0])-int(reseta))
 
                 
         #text[0]="0"
@@ -440,6 +479,10 @@ def reset_toilet(resetlis,text,reseta,resetb):
             if sensor.id =="2":
                 resetb=sensors[1].val
                 #sensors[1].val="0"
+    # else:
+    #     for sensor in sensors:
+    #         if sensor.id =="2":
+    #             sensors[1].val=str(int(PARA[1])-int(resetb))
                 
         #text[1]="0"
     #print(f"textlis={text}")
@@ -448,9 +491,9 @@ def reset_toilet(resetlis,text,reseta,resetb):
     sensors=Sensor.query.all()
     for sensor in sensors:
         if sensor.id =="1":
-            sensor_vals1=sensor.val
+            sensor_vals1=str(int(sensor.val)-int(reseta))
         elif sensor.id =="2":
-            sensor_vals2=sensor.val
+            sensor_vals2=str(int(sensor.val)-int(resetb))
         elif sensor.id =="3":
             sensor_vals3=sensor.val
     text=[sensor_vals1,sensor_vals2,sensor_vals3]
@@ -460,7 +503,7 @@ def reset_toilet(resetlis,text,reseta,resetb):
 @app.route('/',methods=['GET','POST'])
 def usermap():
     global TOILETA,GARBAGE,TOILETB,PARA,RESETA,RESETB
-    dt_now=datetime_now()
+    dt_now = datetime_now()
     toileta_num=0
     toiletb_num=0
     garbage_num=0
@@ -480,8 +523,7 @@ def usermap():
     #print(f"例えば君が{PARA}")
     reset = [request.form.getlist('reseta'),request.form.getlist('resetb'),request.form.get('resetp')]
     PARA,reset,reseta,resetb=reset_toilet(reset,PARA,reseta=0,resetb=0)
-    PARA[0]=str(int(PARA[0])-int(reseta))
-    PARA[1]=str(int(PARA[1])-int(resetb))
+    
     print(f"例えば君が{PARA,reseta,resetb}")
     print(f"なぜこうなった{reset}")
     #print(f"へぇ{reset,PARA}")
@@ -599,10 +641,6 @@ def userfoliummap(loca_yoyogi):
 
 
 
-
-
-
-
-
 if __name__ == "__main__":
-    app.run(debug=True)
+    #app.run(debug=False ,host='0.0.0.0', port=80)
+    app.run(debug=True, host='0.0.0.0', port=5000)
