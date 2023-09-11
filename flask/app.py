@@ -11,6 +11,8 @@ import sqlite3
 TOILETA=0
 GARBAGE=0
 TOILETB=0
+reseta=0
+resetb=0
 
 
 
@@ -461,8 +463,10 @@ def datetime_now():
     
 def reset_toilet(resetlis,text,reseta,resetb):
     sensors = Sensor.query.all() # idでエントリを取得
+    print(f"resetlis={resetlis}")
     if resetlis[0]!=[]:
         #PARA[0]=str(int(PARA[0])-int(reseta))
+        print(f"sensors={sensors}")
         for sensor in sensors:
             if sensor.id =="1":
                 reseta=sensors[0].val
@@ -503,7 +507,7 @@ def reset_toilet(resetlis,text,reseta,resetb):
 
 @app.route('/',methods=['GET','POST'])
 def usermap():
-    global TOILETA,GARBAGE,TOILETB,PARA,RESETA,RESETB
+    global TOILETA,GARBAGE,TOILETB,PARA,RESETA,RESETB,reseta,resetb
     dt_now = datetime_now()
     toileta_num=0
     toiletb_num=0
@@ -523,7 +527,7 @@ def usermap():
     PARA=[sensor_vals1,sensor_vals2,sensor_vals3]
     #print(f"例えば君が{PARA}")
     reset = [request.form.getlist('reseta'),request.form.getlist('resetb'),request.form.get('resetp')]
-    PARA,reset,reseta,resetb=reset_toilet(reset,PARA,reseta=0,resetb=0)
+    PARA,reset,reseta,resetb=reset_toilet(reset,PARA,reseta,resetb)
     
     print(f"例えば君が{PARA,reseta,resetb}")
     print(f"なぜこうなった{reset}")
@@ -545,7 +549,6 @@ def usermap():
         #print(f"なぜ{loca_yoyogi}")
         return render_template('useryoyogi.html',indextoa_res=toileta_num,indextob_res=toiletb_num,indexga_res=garbage_num,loca_yoyogi=loca_yoyogi,dt_now=dt_now)
     
-
 @app.route('/#info-1',methods=['GET','POST'])
 def resetmap():
     #print("Hey")
