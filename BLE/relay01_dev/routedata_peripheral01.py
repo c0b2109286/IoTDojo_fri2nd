@@ -9,7 +9,8 @@ import struct
 import time
 import binascii
 from BLE_advertising import advertising_payload
-import manegement_01
+# import manegement_01
+import info
 
 from micropython import const
 
@@ -93,7 +94,12 @@ class BLE:
 
 def periph(routedata,timeout):
     ble = bluetooth.BLE()
-    gapname = manegement_01.nameinfo()
+    # gapname = manegement_01.nameinfo()
+
+    jf_open = open('info/DN06.json', 'r')
+    jf_load = json.load(jf_open)
+    gapname = jf_load["device_number"]
+    
     ble.config(gap_name= str(gapname))
     set_name = ble.config('gap_name')
     print(set_name)    
@@ -121,7 +127,7 @@ def periph(routedata,timeout):
     connect_count = 0
 
     if b._check is False:
-        b._payload_1("com7")
+        b._payload_1(jf_load["packet_name"])
         while timeout > 0:
             i = (i + 1) % 10
             b.set_dev_name(dt, notify=i == 0, indicate=False)
@@ -131,14 +137,14 @@ def periph(routedata,timeout):
     print(dt)
     return dt
     
-    #if b._check is True:
-    #    connect_count += 1
+    if b._check is True:
+        connect_count += 1
 
-    #if b._check is False and connect_count is 1:
-    #    b._payload_2("com7")
-    #    i = (i + 1) % 10
-    #    b.set_dev_name(data, notify=i == 0, indicate=False)
-    #    print("アドバタイズ完了")
+    if b._check is False and connect_count is 1:
+       b._payload_2(jf_load["packet_name"])
+       i = (i + 1) % 10
+       b.set_dev_name(data, notify=i == 0, indicate=False)
+       print("アドバタイズ完了")
 
 
 if __name__ == "__main__":
