@@ -5,7 +5,9 @@ import utime
 import ubinascii
 import micropython
 import machine
-import manegement_s1
+# import manegement_s1
+import info
+import json
 
 from BLE_advertising import decode_services, decode_name
 
@@ -82,8 +84,13 @@ def _irq(self, event, data):
             addr_type, addr, adv_type, rssi, adv_data = data
             adv = ubinascii.hexlify(adv_data)
             adr = ubinascii.hexlify(addr)
-            packet = manegement_s1.packetinfo()
-            if ubinascii.hexlify(packet) in adv: #esp32-1A
+            # packet = manegement_s1.packetinfo()
+            
+            jf_open = open("info/SN01.json")
+            jf_load = load(jf_open)
+            packet = jf_load["packet_name"]
+            
+            if '6573703332' in adv: #esp32
                 adv = str(ubinascii.unhexlify(adv), 'utf-8')
                 print('type:{} addr:{} rssi:{} data:{}'.format(addr_type, adr, rssi, adv))    
                 if adv_type in (_ADV_IND, _ADV_DIRECT_IND) and _Dev_Info_UUID in decode_services(adv_data):
