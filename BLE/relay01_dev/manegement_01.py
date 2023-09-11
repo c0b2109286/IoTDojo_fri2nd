@@ -5,15 +5,15 @@ import senddistance_peripheral01
 import makeroute_01
 import ubinascii
 
-def nameinfo():
-    dev_name = 1
-    return dev_name
-def packetinfo():
-    dev_packet = "esp32-2A"
-    return dev_packet
-def positioninfo():
-    dev_position = "relay1"
-    return dev_position
+# def nameinfo():
+#     dev_name = 1
+#     return dev_name
+# def packetinfo():
+#     dev_packet = "esp32-2A"
+#     return dev_packet
+# def positioninfo():
+#     dev_position = "relay1"
+#     return dev_position
 
 class Management():
     
