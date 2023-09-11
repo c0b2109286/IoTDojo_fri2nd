@@ -57,10 +57,10 @@ class Management():
 
 if __name__ == "__main__":
     mg = Management()
-    #data = mg._RoutedataSend()
-    #route = mg._RoutedataGet()
+    data = mg._RoutedataSend()
+    route = mg._RoutedataGet()
     #mg._RoutedataWrite(data)
-    #mg._MakeRouteTable()
+    mg._MakeRouteTable()
     distance = mg.getdistance()
     mg.SenserdataSend(distance)
 
