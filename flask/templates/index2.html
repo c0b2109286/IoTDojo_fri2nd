@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<title>テスト</title>
-<meta name="description" content="テスト中">
+<title>システム管理者</title>
+<meta name="description" content="システム管理">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="/static/css/style.css">
 {% endblock %}
@@ -29,10 +29,10 @@
                         <input type = "submit" name = "btn" value = "トイレA" class="btn_02"></input>
                     </li>
                     <li>
-                        <input type = "submit" name = "btn" value = "トイレB" class="btn_03"></input>
+                        <input type = "submit" name = "btn" value = "ゴミ箱A" class="btn_03"></input>
                     </li>
                     <li>
-                        <input type = "submit" name = "btn" value = "ゴミ箱A" class="btn_04"></input>
+                        <input type = "submit" name = "btn" value = "トイレB" class="btn_04"></input>
                     </li>
                 </ul>
             </form>
@@ -57,8 +57,8 @@
         <div class="btn_map">
             <input type = "submit" name = "btn" value = "ALL" class="btn_01"></input>
             <input type = "submit" name = "btn" value = "トイレA" class="btn_02"></input>
-            <input type = "submit" name = "btn" value = "トイレB" class="btn_03"></input>
-            <input type = "submit" name = "btn" value = "ゴミ箱A" class="btn_04"></input>
+            <input type = "submit" name = "btn" value = "ゴミ箱A" class="btn_03"></input>
+            <input type = "submit" name = "btn" value = "トイレB" class="btn_04"></input>
             <div class = "logout">
                 <a href="{{url_for('login')}}">
                     <!--urlはリンク先の関数名-->
@@ -69,7 +69,7 @@
             </div>
         </div>
 
-            <iframe class= "frame_center" src="http://127.0.0.1:5000/map/{{location}}"  style="border-radius: 20px;"></iframe>
+            <iframe class= "frame_center" src="http://192.168.2.104/map/{{location}}"  style="border-radius: 20px;"></iframe>
 
 
     </form>
