@@ -346,7 +346,8 @@ def receive_data():
     data = request.get_json()  # 受信したJSONデータを取得
 
     dtci = re.findall(r"\d+", data)
-    if int(dtci[0] <= 11):
+    print(f"dtci={dtci}")
+    if len(dtci)>2:
 
         # route.dbに値を入れる
         new_post = route(route = data)
@@ -355,11 +356,15 @@ def receive_data():
         db.session.commit()
 
         # データの処理
-        print(data)
+        print(f"data={data}")
         
     else:
-        dtci[0]=str(int(dtci[0])-11)
-        print(f"吉野の担当：{dtci}")
+        if int(dtci[0])==5:
+            dtci[0]=1
+        elif int(dtci[0])==11:
+            dtci[0]=2
+        elif int(dtci[0])==9:
+            dtci[0]=3
         
         import time
 
@@ -372,7 +377,7 @@ def receive_data():
 
         # リストに格納
         rea = [formatted_date, formatted_hour]
-        
+
         # データベースへの接続（データベースが存在しない場合は新規作成）
         conn = sqlite3.connect("./instance/location.db")
         # カーソルオブジェクトの作成
@@ -383,7 +388,7 @@ def receive_data():
         c.execute("DELETE FROM sensor WHERE id = ?", (dtci[1],))
 
         # 新しいデータを挿入
-        c.execute("INSERT INTO sensor VALUES (?, ?, ?, ?)", (dtci[1], dtci[2], rea[0], rea[1]))
+        c.execute("INSERT INTO sensor VALUES (?, ?, ?, ?)", (dtci[0], dtci[1], rea[0], rea[1]))
 
         # 変更をコミット（保存）
         conn.commit()
