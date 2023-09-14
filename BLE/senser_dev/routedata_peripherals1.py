@@ -37,6 +37,7 @@ class BLE:
         ((self._handle,),) = self._ble.gatts_register_services((_Dev_SERVICE,))
         self._connections = set()
         self._check = False
+        self._connect_count = 0
 
     def _payload_1(self, name):
         self._name = name
@@ -45,6 +46,12 @@ class BLE:
         self._advertise()
         
     def _payload_2(self, name):
+        self._name = name
+        self._payload_1 = advertising_payload(
+            name=name, services=[_Dev_Info_UUID], appearance=0)
+        self._advertise()
+        
+    def _payload_3(self, name):
         self._name = name
         self._payload_2 = advertising_payload(
             name=name, services=[_Dev_Info_UUID], appearance=0)
@@ -56,12 +63,16 @@ class BLE:
             conn_handle, _, _ = data
             self._connections.add(conn_handle)
             self._check = True
+            print(self._check)
         elif event == _IRQ_CENTRAL_DISCONNECT:
             conn_handle, _, _ = data
             self._connections.remove(conn_handle)
             # 新しい接続を許可するために再びアドバタイズを開始する．
             self._check = False
-            self._advertise()
+            print(self._check)
+            self._connect_count += 1
+            print(f"connection : {self._connect_count}")
+            #self._advertise()
         elif event == _IRQ_GATTS_INDICATE_DONE:
             conn_handle, value_handle, status = data
 
@@ -83,7 +94,7 @@ class BLE:
     def _stop(self, interval_us=None):
         self._ble.gap_advertise(interval_us, adv_data=self._payload_2)
 
-def periph(timeout=60):
+def periph(timeout=30):
     ble = bluetooth.BLE()
     
     # gapname = manegement_s1.nameinfo()
@@ -103,23 +114,19 @@ def periph(timeout=60):
     b = BLE(ble)
 
     i = 0
-    connect_count = 0
-
-    if b._check is False:
-        b._payload_1(jf_load["packet_name"])
-        while timeout > 0:
+    
+    b._payload_1(jf_load["packet_name"])
+    print(timeout)
+    print(b._connect_count)
+    while timeout > 1 and b._connect_count is 0:
+        if b._check is False:
             i = (i + 1) % 10
             b.set_dev_name(data, notify=i == 0, indicate=False)
             print(".")
             utime.sleep_ms(1000)
             timeout -=1
-
-    if b._check is True:
-        connect_count += 1
-        print(f"connection : {connect_count}")
-            
-    if timeout == 0 and connect_count > 2:
-        b._payload_2(jf_load["packet_name"])
+    else:
+        b._payload_3(jf_load["packet_name"])
         b.set_dev_name(data, notify=i == 0, indicate=False)
         print("終了")
         
