@@ -4,15 +4,9 @@ import senddistance_peripherals1
 import makeroute_s1
 import get_s1
 
-# def nameinfo():
-#     dev_name = 8 # デバイス名
-#     return dev_name
-# def packetinfo():
-#     dev_packet = "esp32-1A" # パケット名
-#     return dev_packet
-# def positioninfo():
-#     dev_position = "senser01" # 用途
-#     return dev_position
+with open("data/makeroute_data.txt","w",encoding="utf-8")as f:
+    f.write('')
+    f.close()
 
 class Management():
     # センサデバイスの行う動作を纏めたクラス.
@@ -23,24 +17,10 @@ class Management():
         
     def _RoutedataGet(self): # 経路表作成用のデータ取得
         routedata = routeget_centrals1.Centr()
+        print(routedata)
         return routedata
-        
-    # def _RoutedataWrite(self,route): # 経路表作成用データの保存
-    #     with open('data/makeroute_data.txt','w',encoding='utf-8')as f:
-    #         print(route)
-    #         print(type(route))
-    #         f.write(str(route))
-    #     f.close()
-
-    def _chack(self):
-        with open('data/makeroute_data.txt',"r",encoding='utf-8')as f:
-            print(f.read())
-        f.close()
 
     def _MakeRouteTable(self): # 経路表作成
-        #with open("data/makeroute_data.txt",'r',encoding="utf-8")as f:
-        #    f.read()
-        #f.close()
         makeroute_s1._routemake()
         
     def getdistance(self): # 距離データの取得
@@ -59,8 +39,6 @@ if __name__ == "__main__":
     mg = Management()
     data = mg._RoutedataSend()
     route = mg._RoutedataGet()
-    #mg._RoutedataWrite(data)
     mg._MakeRouteTable()
     distance = mg.getdistance()
     mg.SenserdataSend(distance)
-
