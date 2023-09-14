@@ -95,6 +95,7 @@ class RouteMake:
             print(num)
             #json.dump(dic,f,indent=num)
             ujson.dump(dic,f)
+            f.close()
 
 
 def _routemake(): #main関数
