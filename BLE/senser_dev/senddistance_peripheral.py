@@ -1,5 +1,3 @@
-# com8 ペリフェラルコード
-
 import ujson
 import bluetooth
 import random
@@ -7,7 +5,7 @@ import struct
 import time
 import binascii
 from BLE_advertising import advertising_payload
-import get_s1
+import get
 import info
 import json
 
@@ -99,8 +97,8 @@ def periph(distance, timeout):
     name = None
 
     jf_open = open('info/SN01.json', 'r')
-    jf_load = jsn.load(jf_open)
-    gapname = jf_load[device_number]
+    jf_load = json.load(jf_open)
+    gapname = jf_load["device_number"]
     
     ble = bluetooth.BLE()
     ble.config(gap_name= gapname)
@@ -120,10 +118,14 @@ def periph(distance, timeout):
     # print(route["relay01"])
     # print(route["relay11"])
     
+    jf_open = open('info/SN01.json', 'r')
+    jf_load = json.load(jf_open)
+    gapname = jf_load["device_number"]
+    
     if b._check is False and flag == 0:
         b._payload_1(route["relay01"])
         while b._check is False and timeout > 0:
-            data = distance
+            data = gapname + '_' + distance
             i = (i + 1) % 10
             b.set_dev_name(data, notify=i == 0, indicate=False)
             payload = binascii.hexlify(b._payload_1)
@@ -145,7 +147,7 @@ def periph(distance, timeout):
     if b._check is False and flag == 1:
         b._payload_2(route["relay11"])
         while b._check is False and timeout > 0:
-            data = distance
+            data = gapname + '_' +distance
             i = (i + 1) % 10
             b.set_dev_name(data, notify=i == 0, indicate=False)
             payload = binascii.hexlify(b._payload_2)
