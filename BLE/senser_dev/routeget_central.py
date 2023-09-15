@@ -79,7 +79,7 @@ class BLEDevCentral:
         self._end_handle = None  # 終了ハンドル
         self._value_handle = None  # 値ハンドル
 
-def _irq(self, event, data):
+    def _irq(self, event, data):
         if event == _IRQ_SCAN_RESULT:
             addr_type, addr, adv_type, rssi, adv_data = data
             adv = ubinascii.hexlify(adv_data)
@@ -87,7 +87,7 @@ def _irq(self, event, data):
             # packet = manegement_s1.packetinfo()
             
             jf_open = open("info/SN01.json")
-            jf_load = load(jf_open)
+            jf_load = json.load(jf_open)
             packet = jf_load["packet_name"]
             
             if '6573703332' in adv: #esp32
@@ -182,69 +182,69 @@ def _irq(self, event, data):
                     self._notify_callback(self._value)
 
 # 接続およびキャラクタリスティックを正常に検出した場合にTrueを返します。
-def is_connected(self):
-    return self._conn_handle is not None and self._value_handle is not None
+    def is_connected(self):
+        return self._conn_handle is not None and self._value_handle is not None
 
-# 環境センサーサービスを広告しているデバイスを検出します。
-def scan(self, callback=None, scantime):
-    self._addr_type = None
-    self._addr = None
-    self._scan_callback = callback
-    self._ble.gap_scan(scantime)
+    # 環境センサーサービスを広告しているデバイスを検出します。
+    def scan(self, callback=None, scantime = 0):
+        self._addr_type = None
+        self._addr = None
+        self._scan_callback = callback
+        self._ble.gap_scan(scantime)
 
-# スキャンを停止します。
-def not_scan(self):
-    self._ble.gap_scan(None)
+    # スキャンを停止します。
+    def not_scan(self):
+        self._ble.gap_scan(None)
 
-# 指定したデバイスに接続します（それ以外の場合、スキャンからキャッシュされたアドレスを使用します）。
-def connect(self, addr_type=None, addr=None, callback=None):
-    self._addr_type = addr_type or self._addr_type
-    self._addr = addr or self._addr
-    self._conn_callback = callback
-    if self._addr_type is None or self._addr is None:
-        return False
-    self._ble.gap_connect(self._addr_type, self._addr) # 接続要求
-    return True
+    # 指定したデバイスに接続します（それ以外の場合、スキャンからキャッシュされたアドレスを使用します）。
+    def connect(self, addr_type=None, addr=None, callback=None):
+        self._addr_type = addr_type or self._addr_type
+        self._addr = addr or self._addr
+        self._conn_callback = callback
+        if self._addr_type is None or self._addr is None:
+            return False
+        self._ble.gap_connect(self._addr_type, self._addr) # 接続要求
+        return True
 
-# 現在のデバイスから切断します。
-def disconnect(self):
-    if not self._conn_handle:
-        return
-    self._ble.gap_disconnect(self._conn_handle)
-    self._reset()
+    # 現在のデバイスから切断します。
+    def disconnect(self):
+        if not self._conn_handle:
+            return
+        self._ble.gap_disconnect(self._conn_handle)
+        self._reset()
 
-# 読み取り要求を発行し、データをコールバックで取得します。
-def read(self, callback):
-    if not self.is_connected():
-        return
-    self._read_callback = callback
-    self._ble.gattc_read(self._conn_handle, self._value_handle) # リモート読み込み
+    # 読み取り要求を発行し、データをコールバックで取得します。
+    def read(self, callback):
+        if not self.is_connected():
+            return
+        self._read_callback = callback
+        self._ble.gattc_read(self._conn_handle, self._value_handle) # リモート読み込み
 
-# デバイスから通知を受信したときに呼び出すコールバックを設定します。
-def on_notify(self, callback):
-    self._notify_callback = callback
+    # デバイスから通知を受信したときに呼び出すコールバックを設定します。
+    def on_notify(self, callback):
+        self._notify_callback = callback
 
-# データを更新し、データがSint16（16ビットの整数）で、分解能が0.01度セルシウスの温度データである場合に使用します。
-def _update_value(self, data):
-    # データはSint16で、温度データは0.01度セルシウスの分解能を持っています。
-    self._value = ubinascii.hexlify(data)
-    print(type(self._value))
-    #self._value = bytes(self._value)
-    self._value = ubinascii.unhexlify(self._value)
-    print(type(self._value))
-    self._value = self._value.replace(b'\x00',b'').decode('utf-8')
-    #self._value = self._value.strip()
-    return self._value
+    # データを更新し、データがSint16（16ビットの整数）で、分解能が0.01度セルシウスの温度データである場合に使用します。
+    def _update_value(self, data):
+        # データはSint16で、温度データは0.01度セルシウスの分解能を持っています。
+        self._value = ubinascii.hexlify(data)
+        print(type(self._value))
+        #self._value = bytes(self._value)
+        self._value = ubinascii.unhexlify(self._value)
+        print(type(self._value))
+        self._value = self._value.replace(b'\x00',b'').decode('utf-8')
+        #self._value = self._value.strip()
+        return self._value
 
-# 現在の値を返します。
-def value(self):
-    return self._value
+    # 現在の値を返します。
+    def value(self):
+        return self._value
 
-def stop(self):
-    if not self._conn_handle:
-        return
-    self._ble.gap_disconnect(self._conn_handle)
-    self._reset()
+    def stop(self):
+        if not self._conn_handle:
+            return
+        self._ble.gap_disconnect(self._conn_handle)
+        self._reset()
 
 def Centr():
     # Bluetooth Low Energy（BLE）のインスタンスを作成します。
@@ -260,6 +260,8 @@ def Centr():
     connected = False
 
     connect_count = 0
+    
+    SCAN = True
 
     # BLEデバイスのスキャン結果を処理するコールバック関数
     def on_scan(addr_type, addr, name): # スキャンのコールバック
@@ -282,10 +284,11 @@ def Centr():
             print("デバイスが見つかりませんでした.")
 
     # デバイスのスキャンを開始します。
-    if connect_count = 0:
-        central.scan(callback=on_scan, 0)
-    else :
-        central.scan(callback=on_scan, 60000)
+    if connect_count is 0:
+        #central.scan(callback=on_scan, scantime = 60000) #60秒
+        central.scan(callback=on_scan, scantime= 30000)
+    else:
+        central.scan(callback=on_scan, scantime = 20000)
         
     # 接続待ち...
     while not central.is_connected():
@@ -297,7 +300,7 @@ def Centr():
 
     # データの読み取りを明示的に実行し、"print"をコールバックとして使用します。
     count = 0
-    while count < 3:
+    while count < 1:
         central.read(callback=print)
         print("#####")
         utime.sleep_ms(2000)
@@ -310,16 +313,28 @@ def Centr():
     
     # 接続を切断します。
     central.disconnect()
+    
+    jf_open = open('info/SN01.json', 'r')
+    jf_load = json.load(jf_open)
+    gapname = jf_load["device_number"]
+    
+    if gapname in routedata:
+        if connect_count is 0:
+            with open('data/makeroute_data.txt','w',encoding='utf-8')as f:
+                print(routedata)
+                print(type(routedata))
+                f.write(str(routedata))
+                f.close()
+        else:
+            with open('data/makeroute_data.txt','a',encoding='utf-8')as f:
+                print(routedata)
+                print(type(routedata))
+                f.write(str(routedata))
+                f.close()
+        
     connect_count += 1
     print(connect_count)
     print("切断しました．再接続します")
-    
-    # def _RoutedataWrite(self,route): # 経路表作成用データの保存
-    with open('data/makeroute_data.txt','w',encoding='utf-8')as f:
-        print(routedata)
-        print(type(routedata))
-        f.write(str(routedata))
-        f.close()
 
     return routedata
 
