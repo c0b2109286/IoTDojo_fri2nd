@@ -1,8 +1,8 @@
-import routedata_peripherals1
-import routeget_centrals1
-import senddistance_peripherals1
-import makeroute_s1
-import get_s1
+import routedata_peripheral
+import routeget_central
+import senddistance_peripheral
+import makeroute
+import get
 
 with open("data/makeroute_data.txt","w",encoding="utf-8")as f:
     f.write('')
@@ -13,18 +13,18 @@ class Management():
     # Manegmentクラスを定義して経路データの送受信と書き込み(，確認)を行う各モジュールを呼び出す関数を定義する．
     
     def _RoutedataSend(self): # 経路データの送信
-        routedata_peripherals1.periph()
+        routedata_peripheral.periph()
         
     def _RoutedataGet(self): # 経路表作成用のデータ取得
-        routedata = routeget_centrals1.Centr()
-        print(routedata)
+        routedata = routeget_central.Centr()
+        #print(routedata)
         return routedata
 
     def _MakeRouteTable(self): # 経路表作成
-        makeroute_s1._routemake()
+        makeroute._routemake()
         
     def getdistance(self): # 距離データの取得
-        distance = get_s1.distance()
+        distance = get.distance()
         print("#####")
         print(distance) #ここで絶対にstrにしておく
         print(type(distance))
@@ -33,7 +33,7 @@ class Management():
         return distance
         
     def SenserdataSend(self,distance): # 作成した経路表に基づく距離データの送信
-        senddistance_peripherals1.periph(distance,10)
+        senddistance_peripheral.periph(distance,10)
 
 if __name__ == "__main__":
     mg = Management()
