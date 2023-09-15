@@ -9,7 +9,8 @@ import struct
 import time
 import binascii
 from BLE_advertising import advertising_payload
-import manegment_5
+import info
+
 
 from micropython import const
 
@@ -93,7 +94,9 @@ class BLE:
 
 def periph(routedata,timeout=20):
     ble = bluetooth.BLE()
-    gapname = manegment_5.nameinfo()
+    jf_open = open('info/DN02.json', 'r')
+    jf_load = json.load(jf_open)
+    gapname = jf_load["device_number"]
     ble.config(gap_name= str(gapname))
     set_name = ble.config('gap_name')
     print(set_name)    
@@ -121,7 +124,7 @@ def periph(routedata,timeout=20):
     connect_count = 0
 
     if b._check is False:
-        b._payload_1("com5")
+        b._payload_1(jf_load["packet_name"])
         while timeout > 0:
             i = (i + 1) % 10
             b.set_dev_name(dt, notify=i == 0, indicate=False)
