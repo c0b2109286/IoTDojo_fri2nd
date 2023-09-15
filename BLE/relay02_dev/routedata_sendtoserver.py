@@ -4,7 +4,7 @@ import urequests
 
 #def send():
 def send(senddata):
-    url = 'http://192.168.42.229:80/data' #wifi環境をflaskと一致させる
+    url = ' ' #wifi環境をflaskと一致させる
     
     #with open('sendroutedata.txt', 'r', encoding = 'utf-8')as f:
     #    data = f.read()
@@ -22,6 +22,7 @@ def send(senddata):
     res = urequests.post(url, data=json.dumps(sendData),headers=header)
     print("サーバからのステータスコード：", res.status_code)
     res.close()
+    return res.status_code
 
 
 if __name__ == '__main__':
