@@ -5,7 +5,7 @@
 <meta name="description" content="テスト中">
 <link rel="stylesheet" href="{{url_for('static',filename='/css/userstyle.css')}}">
 <link rel="stylesheet" href="{{url_for('static',filename='/css/userstyle2.css')}}">
-<link rel="stylesheet" type="text/css" href="../static/css/modaal.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/Modaal/0.4.4/css/modaal.min.css">
 <!--<link rel="stylesheet" href="{{url_for('static',filename='button.css')}}">-->
 <!-- <meta http-equiv="refresh" content=10; URL="http://127.0.0.1:5000"> -->
 {% endblock %}
@@ -117,7 +117,7 @@
 
   <hr>
 <div id="main">
-<iframe  class= "frame_center" src="http://127.0.0.1:5000/{{loca_yoyogi}}" width="100%" height="500" style="border-radius: 20px;"></iframe>
+<iframe  class= "frame_center" src="/{{loca_yoyogi}}" width="100%" height="500" style="border-radius: 20px;"></iframe>
 </div></form>
 
 
