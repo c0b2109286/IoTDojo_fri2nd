@@ -342,69 +342,105 @@ def foliummap(location):
     return render_template('index.html')
 
 
+#----------------------------------------------------------------------------------------
+def check_and_update_database(i):
+    # データベースへの接続（データベースが存在しない場合は新規作成）
+    conn = sqlite3.connect("./instance/location.db")
+    # カーソルオブジェクトの作成
+    cursor = conn.cursor()
+    if i > 0:
+        cursor.execute('SELECT id FROM breakesp WHERE id=?', (i,))
+        if cursor.fetchone():
+            print(f"この{i}は壊れたままです")
+        else:
+            cursor.execute('INSERT INTO breakesp (id) VALUES (?)', (i,))
+            conn.commit()
+            print(f"{i}を追加しました")
+    elif i==0:
+        print("壊れた実機はないそうです")
+    else:
+        abs_i = abs(i)
+        cursor.execute('SELECT id FROM breakesp WHERE id=?', (abs_i,))
+        if cursor.fetchone():
+            cursor.execute('DELETE FROM breakesp WHERE id=?', (abs_i,))
+            conn.commit()
+            print(f"{abs_i}を削除しました")
+        else:
+            print(f"{i}は壊れたという報告は来てません")
+    conn.close()
+
+
+
 @app.route('/data', methods=['POST','GET'])
 def receive_data():
+    print("-----------------------------------------------------------------------------")
     data = request.get_json()  # 受信したJSONデータを取得
+    #data={"message":"5_40"}
+    print(f"dataミス={data}")
+    data = data.get('message', '')
+    print(f"dataget={data}")
 
     dtci = re.findall(r"\d+", data)
     print(f"dtci={dtci}")
     if len(dtci)>3:
 
-        split_data = data.split("_")
-        if int(split_data[1]) == 0:
-            print("send_back")
-            print(split_data)
-            routing_table = mk_routing_table()
-            print(routing_table)
-    
-            for one_table in routing_table:
-                if int(one_table[0].split("_")[0]) == int(split_data[0]):
-                    print("redirect")
-                    #return redirect(url_for("send_to_esp", parameter = one_table))
-                    return send_to_esp(one_table)
+        # route.dbに値を入れる
+        new_post = route(route = data)
+
+        db.session.add(new_post)
+        db.session.commit()
 
         # データの処理
         print(f"data={data}")
         
     else:
-        if int(dtci[0])==5:
-            dtci[0]=1
-        elif int(dtci[0])==11:
-            dtci[0]=2
-        elif int(dtci[0])==9:
-            dtci[0]=3
-        
-        import time
+        try:
+            if int(dtci[0])==5:
+                dtci[0]=1
+            elif int(dtci[0])==11:
+                dtci[0]=2
+            elif int(dtci[0])==9:
+                dtci[0]=3
+            #print(f"吉野の担当：{dtci}")
+            
+            import time
 
-        # 現在のローカル時間を取得
-        local_time = time.localtime()
+            # 現在のローカル時間を取得
+            local_time = time.localtime()
 
-        # 年月日と時間を整形
-        formatted_date = time.strftime("%Y%m%d", local_time)
-        formatted_hour = time.strftime("%H%M%S", local_time)
+            # 年月日と時間を整形
+            formatted_date = time.strftime("%Y%m%d", local_time)
+            formatted_hour = time.strftime("%H%M%S", local_time)
 
-        # リストに格納
-        rea = [formatted_date, formatted_hour]
+            # リストに格納
+            rea = [formatted_date, formatted_hour]
+            #print(f"吉野の担当：{rea}")
+            
+            # データベースへの接続（データベースが存在しない場合は新規作成）
+            conn = sqlite3.connect("./instance/location.db")
+            # カーソルオブジェクトの作成
+            c = conn.cursor()
+            
+            
+            # 同じIDのデータがすでに存在する場合、それを削除
+            c.execute("DELETE FROM sensor WHERE id = ?", (dtci[0],))
 
-        # データベースへの接続（データベースが存在しない場合は新規作成）
-        conn = sqlite3.connect("./instance/location.db")
-        # カーソルオブジェクトの作成
-        c = conn.cursor()
-        
-        
-        # 同じIDのデータがすでに存在する場合、それを削除
-        c.execute("DELETE FROM sensor WHERE id = ?", (dtci[1],))
+            # 新しいデータを挿入
+            c.execute("INSERT INTO sensor VALUES (?, ?, ?, ?)", (dtci[0], dtci[1], rea[0], rea[1]))
 
-        # 新しいデータを挿入
-        c.execute("INSERT INTO sensor VALUES (?, ?, ?, ?)", (dtci[0], dtci[1], rea[0], rea[1]))
-
-        # 変更をコミット（保存）
-        conn.commit()
-        
-        # 接続を閉じる
-        conn.close()
+            # 変更をコミット（保存）
+            conn.commit()
+            
+            # 接続を閉じる
+            conn.close()
+            
+            check_and_update_database(int(dtci[2]))
+            
+        except:
+            print(f"やってきたデータになんらかの不具合があります。該当データ：{dtci}")
 
     return 'Data received successfully'
+
 
 
 
