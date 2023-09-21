@@ -384,14 +384,30 @@ def receive_data():
     print(f"dtci={dtci}")
     if len(dtci)>3:
 
-        # route.dbに値を入れる
-        new_post = route(route = data)
+        split_data = data.split("_")
+        if int(split_data[1]) == 0:
+            print("send_back")
+            print(split_data)
+            routing_table = mk_routing_table()
+            print(routing_table)
+    
+            for one_table in routing_table:
+                if int(one_table[0].split("_")[0]) == int(split_data[0]):
+                    print("redirect")
+                    #return redirect(url_for("send_to_esp", parameter = one_table))
+                    return send_to_esp(one_table)
+                
+        else:
+            existing_route = route.query.filter_by(route=data).first()
 
-        db.session.add(new_post)
-        db.session.commit()
+            if existing_route:
+                db.session.delete(existing_route)
+                db.session.commit()
 
-        # データの処理
-        print(f"data={data}")
+            route_id += 1
+            new_route = route(id = route_id,route=data)
+            db.session.add(new_route)
+            db.session.commit()
         
     else:
         try:
