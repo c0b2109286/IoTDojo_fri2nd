@@ -1,3 +1,5 @@
+# com8 ペリフェラルコード
+
 import ujson
 import bluetooth
 import random
@@ -88,6 +90,18 @@ class BLE:
 
     def _stop(self, interval_us=None):
         self._ble.gap_advertise(interval_us)
+        
+    def _key(self, nd):
+        with open('data/packet_table.json', 'r') as file:
+            data = json.load(file)
+            
+        target_val = nd
+        target_key = 0
+        
+        for key, value in data.items():
+            if value == target_val:
+                target_key = key
+        return target_key
 
 # メインのペリフェラル関数
 def periph(distance, timeout):
@@ -95,6 +109,9 @@ def periph(distance, timeout):
     flag = 0
     data = None
     name = None
+    break_dev = 0
+    next_dev = 0
+    breaking = 0
 
     jf_open = open('info/SN01.json', 'r')
     jf_load = json.load(jf_open)
@@ -123,9 +140,11 @@ def periph(distance, timeout):
     gapname = jf_load["device_number"]
     
     if b._check is False and flag == 0:
-        b._payload_1(route["relay01"])
+        next_dev = route["relay01"]
+        b._payload_1(next_dev)
         while b._check is False and timeout > 0:
-            data = gapname + '_' + distance
+            data = gapname + '_' + distance + '_' + str(break_dev)
+            print(data)
             i = (i + 1) % 10
             b.set_dev_name(data, notify=i == 0, indicate=False)
             payload = binascii.hexlify(b._payload_1)
@@ -137,6 +156,7 @@ def periph(distance, timeout):
 
     if b._check is False:
         print("change")
+        breaking = next_dev
         flag = 1
         str_flag = str(flag)
         print(type(str_flag))
@@ -145,9 +165,12 @@ def periph(distance, timeout):
         timeout = 10
         
     if b._check is False and flag == 1:
-        b._payload_2(route["relay11"])
+        next_dev = route["relay11"]
+        b._payload_2(next_dev)
+        break_dev = b._key(breaking)
         while b._check is False and timeout > 0:
-            data = gapname + '_' +distance
+            data = gapname + '_' + distance + '_' + str(break_dev)
+            print(data)
             i = (i + 1) % 10
             b.set_dev_name(data, notify=i == 0, indicate=False)
             payload = binascii.hexlify(b._payload_2)
@@ -167,4 +190,6 @@ def periph(distance, timeout):
     print("終了")
 
 if __name__ == "__main__":
-    periph()
+    dist = 1111
+    to = 10
+    periph(str(dist),to)
