@@ -3,6 +3,7 @@ import routeget_central
 import senddistance_peripheral
 import makeroute
 import get
+import maketabledata
 import ubinascii
 
 import time
@@ -28,6 +29,9 @@ class Management():
 
     def _MakeRouteTable(self): # 経路表作成
         makeroute._routemake()
+
+    def _MakeTableData(self):
+        maketabledata.MakeTableData()
         
     def getdistance(self): # 距離データの取得
         I2C_SCL_PIN = 22  
@@ -48,6 +52,8 @@ class Management():
 if __name__ == "__main__":
     print(ubinascii.hexlify('toserver'))
     mg = Management()
+
+    ## 経路データをサーバへ送信
     #connect = 0
     #for i in range(2):
     #    data = mg._RoutedataSend()
@@ -55,8 +61,14 @@ if __name__ == "__main__":
     #    connect += data
     #print(connect)
     #utime.sleep_ms(1000)
+    
+    ## 経路データをサーバから受け取る
     #route = mg._RoutedataGet()
 
+    ## 経路表作成用のデータを作成
+    mg._MakeTableData()
+    ## 経路表作成
     mg._MakeRouteTable()
+    
     distance = mg.getdistance()
     mg.SenserdataSend(distance)
