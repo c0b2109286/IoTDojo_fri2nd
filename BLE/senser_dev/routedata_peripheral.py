@@ -74,14 +74,14 @@ class BLE:
             self._connections.remove(conn_handle)
             # 新しい接続を許可するために再びアドバタイズを開始する．
             self._check = False
-            self._advertise()
+            #self._advertise()
 
         elif event == _IRQ_PERIPHERAL_DISCONNECT:
             conn_handle, _, _ = data
             self._connections.remove(conn_handle)
             # 新しい接続を許可するために再びアドバタイズを開始する．
             self._check = False
-            self._advertise()
+            #self._advertise()
 
         elif event == _IRQ_GATTS_INDICATE_DONE:
             conn_handle, value_handle, status = data
@@ -126,10 +126,10 @@ def periph(timeout=10):
 
     i = 0
     
-    b._payload_1(jf_load["packet_name"])
+    b._payload_1(jf_load["packet_routeTS"])
     print(timeout)
     print(b._connect_count)
-    while timeout > 1 or b._connect_count is not 1:
+    while timeout > 1 or b._connect_count is 0:
         if b._check is False:
             i = (i + 1) % 10
             b.set_dev_name(data, notify=i == 0, indicate=False)
@@ -138,9 +138,10 @@ def periph(timeout=10):
             timeout -=1
 
     if timeout is 0 or b._connect_count is 1:
-        b._payload_3(jf_load["packet_name"])
+        b._payload_3(jf_load["packet_routeTS"])
         b.set_dev_name(data, notify=i == 0, indicate=False)
-        print("終了")
+    print("終了")
+    return b._connect_count
         
 if __name__ == "__main__":
     periph()
