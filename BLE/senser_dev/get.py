@@ -3,12 +3,12 @@ from machine import I2C,Pin
 from vl53l1x import VL53L1X
 
 # I2C通信のSCLピン（クロック）とSDAピン（データ）を指定して,I2Cインターフェースを初期化する．
-I2C_SCL_PIN = 22  
-I2C_SDA_PIN = 21
-i2c = I2C(scl=Pin(I2C_SCL_PIN), sda=Pin(I2C_SDA_PIN))
+#I2C_SCL_PIN = 22  
+#I2C_SDA_PIN = 21
+#i2c = I2C(scl=Pin(I2C_SCL_PIN), sda=Pin(I2C_SDA_PIN))
 
 
-def distance():
+def distance(i2c):
     #i2c = I2C(scl=Pin(I2C_SCL_PIN), sda=Pin(I2C_SDA_PIN))
     
   # 距離センサーであるVL53L1Xのインスタンスを作成して初期化する．
@@ -26,4 +26,7 @@ def distance():
   return distance
 
 if __name__ == "__main__":
-    distance()
+    I2C_SCL_PIN = 22  
+    I2C_SDA_PIN = 21
+    i2c = I2C(scl=Pin(I2C_SCL_PIN), sda=Pin(I2C_SDA_PIN))
+    distance(i2c)
