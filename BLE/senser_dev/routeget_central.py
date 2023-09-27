@@ -86,7 +86,7 @@ class BLEDevCentral:
             adr = ubinascii.hexlify(addr)
             # packet = manegement_s1.packetinfo()
             
-            jf_open = open("info/SN01.json")
+            jf_open = open("info/SN01_DN05.json")
             jf_load = json.load(jf_open)
             packet = jf_load["packet_name"]
             
@@ -315,7 +315,7 @@ def Centr():
     # 接続を切断します。
     central.disconnect()
     
-    jf_open = open('info/SN01.json', 'r')
+    jf_open = open('info/SN01_DN05.json', 'r')
     jf_load = json.load(jf_open)
     gapname = jf_load["device_number"]
     
