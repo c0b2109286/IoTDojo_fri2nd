@@ -109,7 +109,7 @@ def periph(timeout=10):
     ble = bluetooth.BLE()
     
     # gapname = manegement_s1.nameinfo()
-    jf_open = open('info/SN01.json', 'r')
+    jf_open = open('info/SN01_DN05.json', 'r')
     jf_load = json.load(jf_open)
     gapname = jf_load["device_number"]
     
