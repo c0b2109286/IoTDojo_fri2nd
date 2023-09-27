@@ -95,7 +95,7 @@ class BLE:
 
 def periph(routedata,timeout=20):
     ble = bluetooth.BLE()
-    jf_open = open('info/DN02.json', 'r')
+    jf_open = open('info/DN01.json', 'r')
     jf_load = json.load(jf_open)
     gapname = jf_load["device_number"]
     ble.config(gap_name= str(gapname))
@@ -127,6 +127,7 @@ def periph(routedata,timeout=20):
 
     if b._check is False:
         b._payload_1(jf_load["packet_name"])
+        b._payload_1(jf_load["packet_routeTD"])
         while timeout is not 0 and b._check is False:
         #while timeout is not 0:
             i = (i + 1) % 10
