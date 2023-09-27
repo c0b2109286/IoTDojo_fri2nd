@@ -1,5 +1,7 @@
 {
   "device_number" : "9",
   "senser_name" : "2",
-  "packet_name" : "esp32_senser2"
+  "packet_name" : "esp32_senser2",
+  "packet_routeTS" : "senser2_toserver",
+  "packet_routeTD" : "senser2_todevice"
 }
