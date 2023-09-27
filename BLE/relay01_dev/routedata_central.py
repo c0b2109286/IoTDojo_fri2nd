@@ -5,6 +5,7 @@ import utime
 import ubinascii
 import micropython
 import machine
+import json
 
 from BLE_advertising import decode_services, decode_name
 
@@ -79,11 +80,12 @@ class BLEDevCentral:
             addr_type, addr, adv_type, rssi, adv_data = data
             adv = ubinascii.hexlify(adv_data)
             adr = ubinascii.hexlify(addr)
-            jf_open = open('info/SN01.json', 'r')
+            jf_open = open('info/DN06.json', 'r')
             jf_load = json.load(jf_open)
             packet = jf_load["device_number"]
-            if '6573703332' in adv: #esp32
-                
+            
+            #if '6573703332' in adv: #esp32
+            if  '746f736572766572' in adv: #toserver
                 adv = str(ubinascii.unhexlify(adv), 'utf-8')
                 print('type:{} addr:{} rssi:{} data:{}'.format(addr_type, adr, rssi, adv))    
                 if adv_type in (_ADV_IND, _ADV_DIRECT_IND) and _Dev_Info_UUID in decode_services(adv_data):
@@ -266,7 +268,7 @@ def Centr():
 
     # Explicitly issue reads, using "print" as the callback.
     count = 0
-    while count < 3:
+    while count < 1:
         central.read(callback=print)
         print("#####")
         utime.sleep_ms(2000)
