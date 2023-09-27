@@ -119,7 +119,7 @@ def periph(distance,timeout=10):
     
     if b._check is False and flag == 0:
         #b._payload_1("esp32-3A")
-        b._payload_1(route["relay02"])
+        b._payload_1(route["relay01"])
         while b._check is False and timeout > 0:
             #Write every second, notify every 10 seconds.
             #data = set_name + ',' + str_flag
@@ -147,7 +147,7 @@ def periph(distance,timeout=10):
         
     if b._check is False and flag == 1:
         #b._payload_2("esp32-3A")
-        b._payload_2(route["relay12"])
+        b._payload_2(route["relay11"])
         while b._check is False and timeout > 0:
             #Write every second, notify every 10 seconds.
             data = set_name + ',' + str_flag
