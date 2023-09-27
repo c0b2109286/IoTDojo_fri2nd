@@ -53,7 +53,7 @@ if __name__ == "__main__":
     
     routedata = mg._RoutedataGet()
     
-    jf_open = open('info/DN02.json', 'r')
+    jf_open = open('info/DN01.json', 'r')
     jf_load = json.load(jf_open)
     gapname = jf_load["device_number"]
 
