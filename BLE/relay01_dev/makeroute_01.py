@@ -1,10 +1,11 @@
-import json
+import ujson
 from collections import OrderedDict
 
 class RouteMake:
     def _readtxt(self):
+        # テキストファイルからデータを読み込んでlistにする.
         split = []
-        with open("data/makeroutedata.txt",'r',encoding="utf-8")as f:
+        with open("data/routetabledata.txt",'r',encoding="utf-8")as f:
             data = f.readlines()
             for i in range(len(data)):
                 # if data[i] in '\n':
@@ -12,18 +13,19 @@ class RouteMake:
                 data[i] = data[i].split('_')
                 for j in range(len(data[i])):
                     #print(data[0][0])
-                    if '\n' in data[i][j]:
-                        data[i][j] = data[i][j].replace('\n', '')
                     if '\r' in data[i][j]:
                         data[i][j] = data[i][j].replace('\r', '')
+                    if '\n' in data[i][j]:
+                        data[i][j] = data[i][j].replace('\n', '')
                 split.append(data[i])
             print(split)
             f.close()
             return split
         
     def _makeval(self,split):
-        with open("data/packettable.json", 'r', encoding="utf-8") as f:
-            table= json.load(f)
+        # JSONファイルから値を取得して二重リストを作成する.
+        with open("data/packet_table.json", 'r', encoding="utf-8") as f:
+            table= ujson.load(f)
             print("@@@@@")
             print(table)
             print(split)
@@ -44,6 +46,7 @@ class RouteMake:
             return lis
 
     def _makekey(self, lis):
+        # _makeval関数にて作成したリストから辞書のキーとなる二重リストを作成する．
         print("$$$$$$$$$")
         _lis = []
         for i in range(len(lis)):
@@ -58,12 +61,17 @@ class RouteMake:
         return _lis
 
     def _dict(self,split, val, key):
+        # _makeval関数と_makekey関数によって作成したリストを用いて辞書を生成する．
         print("##########")
         print(val)
         print(key)
+        dic = OrderedDict() #順序付き辞書の作成
         for i in range(len(key)):
+            print(key[0])
             if i is 0:
-                dic= OrderedDict(zip(key[i],val[i]))
+                dic.update(OrderedDict(zip(key[i],val[i])))
+                print(dic)
+                print("&&&&&")
                 hopnum = split[i][-2]
                 dic['hop'+str(i)] = hopnum
                 rank = split[i][-1]
@@ -71,6 +79,8 @@ class RouteMake:
                 print(dic)
             else:
                 dic.update(OrderedDict(zip(key[i],val[i])))
+                print("######")
+                print(dic)
                 hopnum = split[i][-2]
                 dic['hop'+str(i)] = hopnum
                 rank = split[i][-1]
@@ -78,20 +88,23 @@ class RouteMake:
                 print(dic)
         return dic
     
-    def _json(self, dict):
+    def _json(self, dic):
+        # _dict関数によって作成したリストをJSONファイルに書き込む．
         with open('data/routeinfo.json','w',encoding="utf-8") as f:
-            num = len(dict)
+            num = len(dic)
             print(num)
-            json.dump(dict,f)
+            #json.dump(dic,f,indent=num)
+            ujson.dump(dic,f)
+            f.close()
 
 
-def _routemake():
+def _routemake(): #main関数
     rm = RouteMake()
     split = rm._readtxt()
     val = rm._makeval(split)
     key =rm._makekey(val)
-    dict = rm._dict(split,val,key)
-    rm._json(dict)
+    dic = rm._dict(split,val,key)
+    rm._json(dic)
 
 
 if __name__ == "__main__":
