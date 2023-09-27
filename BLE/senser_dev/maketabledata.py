@@ -12,7 +12,7 @@ import os
 
 def MakeTableData():
     
-    jf_open = open('info/SN01.json', 'r')
+    jf_open = open('info/SN01_DN05.json', 'r')
     jf_load = json.load(jf_open)
     gapname = jf_load["device_number"]
     
