@@ -379,6 +379,13 @@ def check_and_update_database(i):
             print(f"{i}は壊れたという報告は来てません")
     conn.close()
 
+def fetch_all_ids():#　壊れたespのリストをデータベースにアクセスして取得する
+    conn = sqlite3.connect("./instance/location.db")
+    cursor = conn.cursor()
+    cursor.execute('SELECT id FROM breakesp')
+    res=[row[0] for row in cursor.fetchall()]
+    conn.close()
+    return res
 
 
 @app.route('/data', methods=['POST','GET'])
