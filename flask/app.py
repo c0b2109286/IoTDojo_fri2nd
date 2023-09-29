@@ -222,6 +222,30 @@ def get_timeout_node(route):
     
     return timeout_node_list
 
+
+def fetch_all_ids():
+    # データベースへの接続（データベースが存在しない場合は新規作成）
+    conn = sqlite3.connect("./instance/location.db")
+    # カーソルオブジェクトの作成
+    cursor = conn.cursor()
+    cursor.execute('SELECT id FROM breakesp')
+    res=[row[0] for row in cursor.fetchall()]
+    conn.close()
+    return res
+
+def fetch_gps_values(i):
+    # データベースへの接続（データベースが存在しない場合は新規作成）
+    conn = sqlite3.connect("./instance/location.db")
+    # カーソルオブジェクトの作成
+    cursor = conn.cursor()
+    # IDリストに基づいてGPSの値を取得
+    cursor.execute('SELECT gps FROM post WHERE id=?', (i,))
+    result = cursor.fetchone()
+    if result:
+        gps_values =result[0].split(',')
+        conn.close()
+    return gps_values
+
 #-------------------------------------------------------------
 
 @app.route('/admin', methods = ["GET", "POST"])
@@ -379,13 +403,6 @@ def check_and_update_database(i):
             print(f"{i}は壊れたという報告は来てません")
     conn.close()
 
-def fetch_all_ids():#　壊れたespのリストをデータベースにアクセスして取得する
-    conn = sqlite3.connect("./instance/location.db")
-    cursor = conn.cursor()
-    cursor.execute('SELECT id FROM breakesp')
-    res=[row[0] for row in cursor.fetchall()]
-    conn.close()
-    return res
 
 
 @app.route('/data', methods=['POST','GET'])
