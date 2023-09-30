@@ -1,10 +1,12 @@
 import time
 import json
 import urequests
+import routedata_getfromserver
+#import sqlite3
 
-#def send():
+
 def send(senddata):
-    url = ' ' #wifi環境をflaskと一致させる
+    url = 'http://192.168.193.229:5000/data' #wifi環境をflaskと一致させる
     
     #with open('sendroutedata.txt', 'r', encoding = 'utf-8')as f:
     #    data = f.read()
@@ -22,9 +24,16 @@ def send(senddata):
     res = urequests.post(url, data=json.dumps(sendData),headers=header)
     print("サーバからのステータスコード：", res.status_code)
     res.close()
-    return res.status_code
-
+    return 
 
 if __name__ == '__main__':
-    senddata = "test"
-    send(senddata)
+    dt = "5_0"
+    #dt = "5_2_1_2"
+    send(dt)
+    print("end")
+    data = routedata_getfromserver.get()
+    #with open('data/routetabledata.txt','w',encoding='utf-8')as f:
+    #    f.write(data)
+    #    f.close()
+    #conn = sqlite3.connect("test.db")
+    #cursor = conn.cursor()
