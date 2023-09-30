@@ -1,15 +1,15 @@
-import routedata_sendtoserver2
-import routedata_central2
-import senddistance_central2
-import distance_sendtoserver2
+import routedata_sendtoserver
+import routedata_central
+import senddistance_central
 import distance_sendtoserver
+import distance_sendtoserver2
 #import senddistance_peripheral
 import makeroute
 import ubinascii
 import json
-import routedata_getfromserver1
+import routedata_getfromserver
 
-import routesendtodevice_peripheral1
+import routesendtodevice_peripheral
 import time
 from machine import Pin, Timer
 import micropython,time
@@ -17,18 +17,18 @@ import micropython,time
 class Management():
     
     def _RoutedataGet(self,List):
-        get = routedata_central2.Centr(List)
+        get = routedata_central.Centr(List)
         return get
         
     def _RoutedataSendtoServer(self,senddata):
-        routedata_sendtoserver2.send(senddata)
+        routedata_sendtoserver.send(senddata)
         
     def _RoutedataSendtoServer2(self,senddata):
-        distance_sendtoserver.send(senddata)
+        distance_sendtoserver2.send(senddata)
     
     #実際に受け取るときには必要
     def _RouteGetFromServer(self):
-        GS = routedata_getfromserver1.get()
+        GS = routedata_getfromserver.get()
         return GS
         
     #def _RoutedataWrite(self, data):
@@ -39,7 +39,7 @@ class Management():
     #        f.close
             
     def _SendRouteForDevice(self,data):
-        routesendtodevice_peripheral1.periph(data)
+        routesendtodevice_peripheral.periph(data)
         
 
     def _MakeRouteTable(self,data):
@@ -49,11 +49,11 @@ class Management():
         makeroute._routemake()
         
     def SenserdataGet(self):
-        distance = senddistance_central2.Centr()
+        distance = senddistance_central.Centr()
         return distance
         
     def SenserdataSend(self,distance):
-        distance_sendtoserver2.send(distance)
+        distance_sendtoserver.send(distance)
 
 if __name__ == "__main__":
     print(ubinascii.hexlify('esp32'))
