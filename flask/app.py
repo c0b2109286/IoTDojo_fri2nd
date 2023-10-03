@@ -246,6 +246,15 @@ def fetch_gps_values(i):
         conn.close()
     return gps_values
 
+# def delete_route():
+#     posts = route.query.all()
+#     break_esp=fetch_all_ids()
+#     for post in posts:
+#         for num in post.route.split("_")[:-1]:
+#             if num in break_esp:
+#                 db.session.delete(post)
+#                 db.session.commit()
+
 #-------------------------------------------------------------
 
 @app.route('/admin', methods = ["GET", "POST"])
@@ -276,7 +285,8 @@ def foliummap(location):
     route, color = mk_all_route(),"gray"                            #ルートに関する代入
     timeout_node_list = get_timeout_node(route)                     #タイムアウトしているノードの特定
     break_esp=fetch_all_ids()#壊れたespの特定
-
+    # delete_route()
+    
     # 灰色の線を描く
     for loc in route:
         folium.PolyLine(locations = [np.float_(get_gps(loc[0])), np.float_(get_gps(loc[1]))], color = "gray").add_to(folium_map)
@@ -318,10 +328,10 @@ def foliummap(location):
                 folium.Circle(location=get_gps(loc_num), radius=15, color = color, fill = True).add_to(folium_map)
 
                 # タイムアウトしたノードにバツを描く
-                for node in timeout_node_list:
-                    #print(f"node={timeout_node_list}")
-                    icon = CustomIcon(icon_image = "./image/batu.png", icon_size = (50, 50), icon_anchor = (25, 25), popup_anchor = (0, 0))
-                    folium.Marker(location=get_gps(node),icon = icon).add_to(folium_map)
+                # for node in timeout_node_list:
+                #     #print(f"node={timeout_node_list}")
+                #     icon = CustomIcon(icon_image = "./image/batu.png", icon_size = (50, 50), icon_anchor = (25, 25), popup_anchor = (0, 0))
+                #     folium.Marker(location=get_gps(node),icon = icon).add_to(folium_map)
                 for i in break_esp:
                     break_node=fetch_gps_values(i)
                     print(f"break_node{break_node}")
@@ -362,9 +372,9 @@ def foliummap(location):
             icon = CustomIcon(icon_image = "./image/batu.png", icon_size = (50, 50), icon_anchor = (25, 25), popup_anchor = (0, 0))
             folium.Marker(location=break_node,icon = icon).add_to(folium_map)
         # タイムアウトしたノードにバツを描く
-        for node in timeout_node_list:
-            icon = CustomIcon(icon_image = "./image/batu.png", icon_size = (50, 50), icon_anchor = (25, 25), popup_anchor = (0, 0))
-            folium.Marker(location=get_gps(node),icon = icon).add_to(folium_map)
+        # for node in timeout_node_list:
+        #     icon = CustomIcon(icon_image = "./image/batu.png", icon_size = (50, 50), icon_anchor = (25, 25), popup_anchor = (0, 0))
+        #     folium.Marker(location=get_gps(node),icon = icon).add_to(folium_map)
  
 
     # サーバのアイコンを描く
