@@ -547,11 +547,11 @@ def resp(text,toileta_num,garbage_num,toiletb_num):
             text[2]=str(round(int(text[2])/4))
             #print(f"これが知りたいのさ２{text[2]}")
             if int(text[2])>=30 and int(text[2])<70:
-                GARBAGE=3
+                GARBAGE=1
             elif int(text[2])>=70 and int(text[2])<100:
                 GARBAGE=2
             elif int(text[2])>=100:
-                GARBAGE=1
+                GARBAGE=3
             else:
                 GARBAGE=0
             garbage_num=int(text[2])
