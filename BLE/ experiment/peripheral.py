@@ -5,7 +5,7 @@ import utime
 import binascii
 from BLE_advertising import advertising_payload
 # import manegement
-import info 
+#import info 
 import json
 
 from micropython import const
@@ -109,9 +109,11 @@ def periph(timeout, routedata = "test"):
     ble = bluetooth.BLE()
     
     # gapname = manegement_s1.nameinfo()
-    jf_open = open('info/DN06.json', 'r')
-    jf_load = json.load(jf_open)
-    gapname = jf_load["device_number"]
+    #jf_open = open('info/DN06.json', 'r')
+    #jf_load = json.load(jf_open)
+    #gapname = jf_load["device_number"]
+
+    gapname = "test_desu"
     
     ble.config(gap_name=str(gapname))
     set_name = ble.config('gap_name')
@@ -127,7 +129,8 @@ def periph(timeout, routedata = "test"):
 
     i = 0
     
-    b._payload_1(jf_load["packet_routeTS"])
+    #b._payload_1(jf_load["packet_routeTS"])
+    b._payload_1("zikken_desu")
     print(timeout)
     print(b._connect_count)
     while timeout > 1 or b._connect_count is 0:
@@ -140,7 +143,7 @@ def periph(timeout, routedata = "test"):
 
     if timeout is 0 or b._connect_count is 1:
     #if timeout is 0:
-        b._payload_3(jf_load["packet_routeTS"])
+        b._payload_3("osimai")
         b.set_dev_name(data, notify=i == 0, indicate=False)
         print("終了")
         
