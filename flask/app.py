@@ -8,13 +8,16 @@ import itertools
 import socket
 import re
 import sqlite3
+import pickle
 TOILETA=0
 GARBAGE=0
 TOILETB=0
 reseta=0
 resetb=0
 route_id = 0
-
+res = None
+list = []
+one_table = []
 
 
 
