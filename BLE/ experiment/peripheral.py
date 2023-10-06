@@ -113,7 +113,7 @@ def periph(timeout, routedata = "test"):
     #jf_load = json.load(jf_open)
     #gapname = jf_load["device_number"]
 
-    gapname = "test_desu"
+    gapname = "desu"
     
     ble.config(gap_name=str(gapname))
     set_name = ble.config('gap_name')
