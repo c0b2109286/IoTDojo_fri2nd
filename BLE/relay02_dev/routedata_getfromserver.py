@@ -9,11 +9,11 @@ def get():
     
     route = None
     
-    url = "http://192.168.193.229:5000/send_to_esp"
+    url = "http://192.168.193.73:5000/send_to_esp"
     #urequests.head(url)
     print("test")
     
-    sendData = {"sign": "get"}
+    sendData = {"sign": "test"}
     print(sendData)
     header = {'Content-Type': 'application/json'}
     
@@ -38,6 +38,8 @@ def get():
         recv = recv.replace(b'\x80\x04\x95)', b'')
         recv = recv.replace(b'\x0b',b'')
         recv = recv.replace(b'\x80\x04\x957', b'')
+        recv = recv.replace(b'\x80\x04\x95\x19\x07', b'')
+        recv = recv.replace(b'\x07', b'')
         print(recv)
         route = str(recv,'utf-8')
         print(route)
