@@ -426,10 +426,12 @@ def receive_data():
 
     dtci = re.findall(r"\d+", data)
     print(f"dtci={dtci}")
+    print(len(dtci))
     if len(dtci)>3:
 
         split_data = data.split("_")
-        if int(split_data[1]) == 0:
+        print(split_data)
+        if int(split_data[-1]) == 0:
             print("send_back")
             print(split_data)
             routing_table = mk_routing_table()
@@ -438,8 +440,10 @@ def receive_data():
             for one_table in routing_table:
                 if int(one_table[0].split("_")[0]) == int(split_data[0]):
                     print("redirect")
+                    print(one_table)
+                    one_table = one_table
                     #return redirect(url_for("send_to_esp", parameter = one_table))
-                    return send_to_esp(one_table)
+                    return one_table
                 
         else:
             existing_route = route.query.filter_by(route=data).first()
@@ -504,17 +508,19 @@ def receive_data():
 
 
 
-@app.route('/send_to_esp', methods=['GET'])
-def send_to_esp():
-    ESP32_IP = "192.168.2.102"  # 例: '192.168.1.100'
-    PORT = 1234
-    MESSAGE = mk_routing_table()
-
-    # TCP接続
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((ESP32_IP, PORT))
-    client_socket.send(MESSAGE.encode())
-    client_socket.close()
+@app.route('/send_to_esp', methods=['GET','POST'])
+def send():
+    global list, res, one_table
+    list = one_table
+    print(list)
+    data = pickle.dumps(list)
+    print(data)
+    if request.method == 'POST':
+        res = request.get_json()
+        res = str(res["sign"])
+        print(res)
+    list = []
+    return {"routedata": str(data)}
 
 
 
