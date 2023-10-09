@@ -91,7 +91,8 @@ class BLEDevCentral:
             packet = jf_load["packet_name"]
             
             #if '6573703332' in adv: #esp32
-            if  '746f736572766572' in adv: #toserver
+            #if  '746f736572766572' in adv: #toserver
+            if  '746f646576696365' in adv: #todevice
                 adv = str(ubinascii.unhexlify(adv), 'utf-8')
                 print('type:{} addr:{} rssi:{} data:{}'.format(addr_type, adr, rssi, adv))    
                 if adv_type in (_ADV_IND, _ADV_DIRECT_IND) and _Dev_Info_UUID in decode_services(adv_data):
