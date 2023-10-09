@@ -68,7 +68,7 @@ class BLE:
             self._connect_count += 1
             print(f"connection : {self._connect_count}")
             utime.sleep_ms(3000)
-            self._check = False
+            #self._check = False
         elif event == _IRQ_CENTRAL_DISCONNECT:
             conn_handle, _, _ = data
             self._connections.remove(conn_handle)
@@ -109,7 +109,7 @@ def periph(timeout=10):
     ble = bluetooth.BLE()
     
     # gapname = manegement_s1.nameinfo()
-    jf_open = open('info/SN01_DN05.json', 'r')
+    jf_open = open('info/SN01.json', 'r')
     jf_load = json.load(jf_open)
     gapname = jf_load["device_number"]
     
@@ -137,10 +137,12 @@ def periph(timeout=10):
             utime.sleep_ms(1000)
             timeout -=1
 
-    if timeout is 0 or b._connect_count is 1:
-        b._payload_3(jf_load["packet_routeTS"])
-        b.set_dev_name(data, notify=i == 0, indicate=False)
-    print("終了")
+        if timeout is 0 or b._connect_count is 1:
+            b._payload_3(jf_load["packet_routeTS"])
+            print("終了")
+            break
+        #b._payload_3(jf_load["packet_routeTS"])
+        #b.set_dev_name(data, notify=i == 0, indicate=False)
     return b._connect_count
         
 if __name__ == "__main__":
