@@ -7,6 +7,10 @@ from BLE_advertising import advertising_payload
 # import manegement_s1
 import info 
 import json
+import machine
+from machine import Pin, Timer
+import micropython,time
+import _thread
 
 from micropython import const
 
@@ -25,6 +29,10 @@ _Dev_Info_UUID = bluetooth.UUID(0x180A)
 _Dev_CHAR = (bluetooth.UUID(0x2A00),
     _FLAG_READ | _FLAG_NOTIFY | _FLAG_INDICATE,) # 読み取り，通知，応答要求付き通知
 _Dev_SERVICE = (_Dev_Info_UUID,(_Dev_CHAR,),)
+
+blue_pin = 15
+blue_led = machine.Pin(blue_pin, machine.Pin.OUT)
+
 
 class BLE:
 
@@ -107,7 +115,6 @@ class BLE:
 
 def periph(timeout=10):
     ble = bluetooth.BLE()
-    
     # gapname = manegement_s1.nameinfo()
     jf_open = open('info/SN01.json', 'r')
     jf_load = json.load(jf_open)
@@ -132,18 +139,23 @@ def periph(timeout=10):
     while timeout > 1 or b._connect_count is 0:
         if b._check is False:
             i = (i + 1) % 10
+            blue_led.on()
             b.set_dev_name(data, notify=i == 0, indicate=False)
             print(".")
             utime.sleep_ms(1000)
+            blue_led.off()
+            utime.sleep(0.5)
             timeout -=1
 
         if timeout is 0 or b._connect_count is 1:
             b._payload_3(jf_load["packet_routeTS"])
             print("終了")
+            blue_led.off()
             break
         #b._payload_3(jf_load["packet_routeTS"])
         #b.set_dev_name(data, notify=i == 0, indicate=False)
     return b._connect_count
+
         
 if __name__ == "__main__":
     periph()
