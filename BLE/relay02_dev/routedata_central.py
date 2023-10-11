@@ -83,17 +83,19 @@ class BLEDevCentral:
             jf_open = open('info/DN01.json', 'r')
             jf_load = json.load(jf_open)
             packet = jf_load["device_number"]
+            
             #if '6573703332' in adv: #esp32
-            if  '746f736572766572' in adv: #toserver
-                adv = str(ubinascii.unhexlify(adv), 'utf-8')
-                print('type:{} addr:{} rssi:{} data:{}'.format(addr_type, adr, rssi, adv))    
-                if adv_type in (_ADV_IND, _ADV_DIRECT_IND) and _Dev_Info_UUID in decode_services(adv_data):
-                    # Found a potential device, remember it and stop scanning.
-                    self._addr_type = addr_type
-                    self._addr = bytes(addr)  # Note: addr buffer is owned by caller so need to copy it.
-                    self._name = adv or "?"
-                    self._ble.gap_scan(None)
-
+            if '746f736572766572' in adv: #toserver
+                if b'73656e736572' not in adv: #senser 
+                    adv = str(ubinascii.unhexlify(adv), 'utf-8')
+                    print('type:{} addr:{} rssi:{} data:{}'.format(addr_type, adr, rssi, adv))    
+                    if adv_type in (_ADV_IND, _ADV_DIRECT_IND) and _Dev_Info_UUID in decode_services(adv_data):
+                        # Found a potential device, remember it and stop scanning.
+                        self._addr_type = addr_type
+                        self._addr = bytes(addr)  # Note: addr buffer is owned by caller so need to copy it.
+                        self._name = adv or "?"
+                        self._ble.gap_scan(None)
+                    
         elif event == _IRQ_SCAN_DONE:
             print('Scan compelete')
             if self._scan_callback:
@@ -184,7 +186,8 @@ class BLEDevCentral:
         self._addr_type = None
         self._addr = None
         self._scan_callback = callback
-        self._ble.gap_scan(0,70000,70000)
+        self._ble.gap_scan(10000,70000,70000)
+        
         
     def not_scan(self):
         self._ble.gap_scan(None)
@@ -232,12 +235,16 @@ class BLEDevCentral:
         return self._value
 
 
-def Centr():
+def Centr(List):
     ble = bluetooth.BLE()
     central = BLEDevCentral(ble)
 
     not_found = False
-    conect = False
+    connection = False
+    
+    print(List)
+    
+    global red_led
             
 
     def on_scan(addr_type, addr, name): #scanのcallback
@@ -246,23 +253,47 @@ def Centr():
             name = ubinascii.hexlify(name)
             addr = ubinascii.hexlify(addr)
             name = str(ubinascii.unhexlify(name), 'utf-8')
-            print("Found sensor:", addr_type, addr, name)
-            central.connect()
-            central.not_scan()
+            if addr not in List:
+                print("Found sensor:", addr_type, addr, name)
+                List.append(addr)
+                central.connect()
+                central.not_scan()
+                connection = True
+                return connection
+            else:
+                print("接続済です．")
+                central.not_scan()
+
         else:
             nonlocal not_found
             not_found = True
             print("No sensor found.")
             
+    def led():
+        red_led.on()
+        utime.sleep(0.5)
+        red_led.off()
+        utime.sleep(0.5)
+            
     
     central.scan(callback=on_scan) #def scan
-        
+    
+    red_pin = 13
+    red_led = machine.Pin(red_pin, machine.Pin.OUT)
+    
+
+    # Wait for connection...
+
     # Wait for connection...
     while not central.is_connected():
-        utime.sleep_ms(100)
-        if not_found:
-            return
-
+        #utime.sleep_ms(100)
+        try:
+            led()
+            if not_found:
+                return
+        finally:
+            red_led.off()
+        
     print("Connected")
 
     # Explicitly issue reads, using "print" as the callback.
@@ -277,7 +308,9 @@ def Centr():
     print(routedata)
     central.disconnect()
     print("Disconnected")
+    
     return routedata
 
 if __name__ == "__main__":
-    Centr()
+    connection_list = []
+    Centr(connection_list)
