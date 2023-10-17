@@ -1,5 +1,6 @@
 import folium
 from flask import Flask,render_template,request,redirect,url_for
+from flask_socketio import SocketIO, emit
 from folium.features import CustomIcon
 from flask_sqlalchemy import SQLAlchemy
 import numpy as np
@@ -22,6 +23,7 @@ table = []
 
 
 app = Flask(__name__)
+socketio = SocketIO(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///location.db'
 db = SQLAlchemy(app) 
 
@@ -769,4 +771,5 @@ def userfoliummap(loca_yoyogi):
 
 if __name__ == "__main__":
     #app.run(debug=False ,host='0.0.0.0', port=80)
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    #app.run(debug=True, host='0.0.0.0', port=5000)
+    socketio.run(app, debug=True, host='0.0.0.0', port=5000)
