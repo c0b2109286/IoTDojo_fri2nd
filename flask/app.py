@@ -16,8 +16,8 @@ reseta=0
 resetb=0
 route_id = 0
 res = None
-list = []
-one_table = []
+send_list = []
+table = []
 
 
 
@@ -512,16 +512,16 @@ def receive_data():
 
 @app.route('/send_to_esp', methods=['GET','POST'])
 def send():
-    global list, res, one_table
-    list = one_table
-    print(list)
-    data = pickle.dumps(list)
+    global send_list, res, table
+    send_list = table
+    print(send_list)
+    data = pickle.dumps(send_list)
     print(data)
     if request.method == 'POST':
         res = request.get_json()
         res = str(res["sign"])
         print(res)
-    list = []
+    send_list = []
     return {"routedata": str(data)}
 
 
