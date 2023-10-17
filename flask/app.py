@@ -510,7 +510,6 @@ def receive_data():
 
 
 
-
 @app.route('/send_to_esp', methods=['GET','POST'])
 def send():
     global list, res, one_table
