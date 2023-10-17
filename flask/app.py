@@ -444,16 +444,16 @@ def receive_data():
                 if int(one_table[0].split("_")[0]) == int(split_data[0]):
                     print("redirect")
                     print(one_table)
-                    one_table = one_table
+                    table = one_table
                     #return redirect(url_for("send_to_esp", parameter = one_table))
-                    return one_table
+                    return table
                 
         else:
-            existing_route = route.query.filter_by(route=data).first()
+            # existing_route = route.query.filter_by(route=data).first()
 
-            if existing_route:
-                db.session.delete(existing_route)
-                db.session.commit()
+            # if existing_route:
+            #     db.session.delete(existing_route)
+            #     db.session.commit()
 
             route_id += 1
             new_route = route(id = route_id,route=data)
