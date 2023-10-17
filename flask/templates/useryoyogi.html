@@ -11,6 +11,19 @@
 {% endblock %}
 
 {% block body %}
+
+<!-- Socket.IOのクライアントライブラリを追加 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+
+<script>
+    // サーバーに接続
+    var socket = io.connect('/');
+
+    // サーバーからのイベントをリッスン
+    socket.on('update_data', function(data) {
+        location.reload();  // ページをリロード
+    });
+</script>
 <h1 style="text-align:center"><font size="20">ParKeeper</font></h1>
 
 <!--<div style="padding: 10px; margin-bottom: 10px; border: 1px solid #333333;">
