@@ -8,6 +8,18 @@
 {% endblock %}
 
 {% block body %}
+<!-- Socket.IOのクライアントライブラリを追加 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+
+<script>
+    // サーバーに接続
+    var socket = io.connect('/');
+
+    // サーバーからのイベントをリッスン
+    socket.on('update_data', function(data) {
+        location.reload();  // ページをリロード
+    });
+</script>
 
 <div class = "container">
 
