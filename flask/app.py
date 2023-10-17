@@ -501,11 +501,16 @@ def receive_data():
             # 接続を閉じる
             conn.close()
             
-            check_and_update_database(int(dtci[2]))
-            
+            try:
+                check_and_update_database(int(dtci[2]))
+            except:
+                pass
         except:
             print(f"やってきたデータになんらかの不具合があります。該当データ：{dtci}")
-
+        #return render_template('useryoyogi.html')
+        # クライアントにデータを送信
+    #print("更新するはずなんだ")
+    socketio.emit('update_data', {'data': 'your_data_here'})
     return 'Data received successfully'
 
 
