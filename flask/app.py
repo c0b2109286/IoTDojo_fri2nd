@@ -534,7 +534,28 @@ def send():
     return {"routedata": str(data)}
 
 
+@app.route('/delete')
+def delete():
+    global route_id
+    route_id = 0
+    posts = route.query.all()
 
+    for post in posts:
+        db.session.delete(post)
+        db.session.commit()
+
+    conn = sqlite3.connect("./instance/location.db")
+    c = conn.cursor()
+    c.execute("DROP TABLE breakesp")
+    try:
+        c.execute('''CREATE TABLE breakesp (id text)''')
+    except:
+        pass
+
+    conn.commit()
+    conn.close()
+
+    return "deleteed"
 
 
 
