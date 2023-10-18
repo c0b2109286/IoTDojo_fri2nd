@@ -275,10 +275,12 @@ def admin():
         print(location)
         if location == "ログアウト":
             return render_template("index.html")
-        route = mk_route_txt(location)
-        return render_template('index2.html', location = location, route = route)
-
-
+        try:
+            route = mk_route_txt(location)
+            return render_template('index2.html', location = location, route = route)
+        except:
+            pass
+        return render_template('index2.html', location = [], route = [])
 
 
 @app.route('/map/<location>',methods = ["GET"])
