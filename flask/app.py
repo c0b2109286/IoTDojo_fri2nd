@@ -424,10 +424,10 @@ def check_and_update_database(i):
 
 @app.route('/data', methods=['POST','GET'])
 def receive_data():
+    global route_id, table
     print("-----------------------------------------------------------------------------")
     data = request.get_json()  # 受信したJSONデータを取得
     #data={"message":"5_40"}
-    print(f"dataミス={data}")
     data = data.get('message', '')
     print(f"dataget={data}")
 
