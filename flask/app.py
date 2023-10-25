@@ -466,11 +466,11 @@ def receive_data():
         
     else:
         try:
-            if int(dtci[0])==5:
+            if int(dtci[0])==3:
                 dtci[0]=1
             elif int(dtci[0])==11:
                 dtci[0]=2
-            elif int(dtci[0])==9:
+            elif int(dtci[0])==7:
                 dtci[0]=3
             #print(f"吉野の担当：{dtci}")
             
@@ -744,15 +744,16 @@ def userfoliummap(loca_yoyogi):
             else:
                 icon_image = "./image/zero.png"
         elif ins == "toiletb":
-            if loca_yoyogi=="ALL" or loca_yoyogi=="トイレB" :
-                if TOILETB==0 :
-                    icon_image = "./image/toilet_b.png"
-                elif TOILETB==1 :
-                    icon_image = "./image/toilet_o.png"
-                elif TOILETB==2:
-                    icon_image = "./image/toilet_r.png"
-            else:
-                icon_image = "./image/zero.png"
+            pass
+            # if loca_yoyogi=="ALL" or loca_yoyogi=="トイレB" :
+            #     if TOILETB==0 :
+            #         icon_image = "./image/toilet_b.png"
+            #     elif TOILETB==1 :
+            #         icon_image = "./image/toilet_o.png"
+            #     elif TOILETB==2:
+            #         icon_image = "./image/toilet_r.png"
+            # else:
+            #     icon_image = "./image/zero.png"
 
         elif ins == "box":
             if loca_yoyogi=="ALL" or loca_yoyogi=="ゴミ箱A" :
