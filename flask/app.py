@@ -354,11 +354,11 @@ def foliummap(location):
 
     else:
         if location == "トイレA": 
-            color, loc_num = "blue", 5
+            color, loc_num = "blue", 3
         elif location == "ゴミ箱A": 
-            color, loc_num = "#FF7E00", 9
-        elif location == "トイレB": 
-            color, loc_num = "#FF18B5", 11
+            color, loc_num = "#FF7E00", 7
+        # elif location == "トイレB": 
+        #     color, loc_num = "#FF18B5", 11
 
         route = mk_route(loc_num)
 
