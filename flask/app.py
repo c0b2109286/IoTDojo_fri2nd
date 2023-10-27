@@ -279,9 +279,9 @@ def foliummap(location):
     start_cords=(35.67061628919986, 139.69567437962016)             #マップの中心位置
     folium_map = folium.Map(location=start_cords, zoom_start=17)    #マップの倍率
     route, color = mk_all_route(),"gray"                            #ルートに関する代入
-    timeout_node_list = get_timeout_node(route)                     #タイムアウトしているノードの特定
     break_esp=fetch_all_ids()#壊れたespの特定
-    # delete_route()
+    
+    delete_route()
     
     # 灰色の線を描く
     for loc in route:
