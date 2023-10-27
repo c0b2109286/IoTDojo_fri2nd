@@ -542,6 +542,24 @@ def delete():
         pass
 
     conn.commit()
+    # 現在の日付と時間を取得
+    now = datetime.now()
+    current_date = now.strftime("%Y%m%d")
+    current_time = now.strftime("%H%M%S")
+
+    # # データベースに接続
+    # conn = sqlite3.connect("./instance/location.db")
+    # cursor = conn.cursor()
+
+    # SQLクエリを実行
+    conn.execute(f"""
+    UPDATE sensor
+    SET val = 0, date = '{current_date}', time = '{current_time}'
+    """)
+
+    # 変更をコミット
+    conn.commit()
+    
     conn.close()
 
     return "deleteed"
