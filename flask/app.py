@@ -45,7 +45,6 @@ class Sensor(db.Model):
     date = db.Column(db.String(100))
     time = db.Column(db.String(100))
     
-    
 """ここからログイン"""
 
 # データベースモデルの定義
@@ -53,6 +52,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
+
 # ログインページの表示
 @app.route('/login')
 def login():
@@ -79,8 +79,6 @@ def login_post():
 @app.route('/main')
 def main():
     return 'Welcome to the main page!'
-
-
     
 
 
@@ -153,28 +151,28 @@ def mk_all_route():
 def get_gps(num):
     posts = Post.query.all()
     for post in posts: 
-        if int(post.id) == num:
+        if int(post.id) == int(num):
             return post.gps.split(",")
 
 #numのgpsナンバーを返答
 def get_num_gps(num):
     posts = Post.query.all()
     for post in posts:
-        if post.id == num:
+        if int(post.id) == int(num):
             return post.num_gps.split(",")
 
 #numのespを返答
 def get_ins(num):
     posts = Post.query.all()
     for post in posts: 
-        if post.id == num:
+        if int(post.id) == int(num):
             return post.ins
 
 #numのespの名前を返答
 def get_ins_name(num):
     posts = Post.query.all()
     for post in posts: 
-        if post.id == num:
+        if int(post.id) == int(num):
             return post.esp_name
 
 # numのセンサからのルートを返す関数
@@ -187,6 +185,7 @@ def mk_route(num):
                 route.append((line[i],line[i+1]))
     return route
 
+# 使っているルートのテキストを返す関数
 def mk_route_txt(loc):
     route = {}
     routes_num = mk_routes_num()
@@ -197,11 +196,12 @@ def mk_route_txt(loc):
             if num != 1:
                 route_txt += " → "
         route[get_ins_name(route_num[0])] = route_txt
+    print(route)
 
     if loc == "ALL": return route.values()
     else: return [route[loc]]
 
-
+# 経路が重なった
 def judge_overlap():
     route_list = []
     routes_num = mk_routes_num()
@@ -213,19 +213,6 @@ def judge_overlap():
         if set(pair[0])&set(pair[1]):
             judge_num_list.append(pair[0][0][0])    
     return judge_num_list
-
-def get_timeout_node(route):
-    node_set = set()
-    for node_tuple in route:
-        for node in node_tuple:
-            node_set.add(node)
-
-    timeout_node_list = []
-    for i in range(1,12):
-        if i not in node_set:
-            timeout_node_list.append(i)
-    
-    return timeout_node_list
 
 
 def fetch_all_ids():
@@ -251,15 +238,17 @@ def fetch_gps_values(i):
         conn.close()
     return gps_values
 
-# def delete_route():
-#     posts = route.query.all()
-#     break_esp=fetch_all_ids()
-#     for post in posts:
-#         for num in post.route.split("_")[:-1]:
-#             if num in break_esp:
-#                 db.session.delete(post)
-#                 db.session.commit()
-
+# 壊れたESPを含む経路をデータベースから削除する
+def delete_route():
+    posts = route.query.all()
+    break_esp=fetch_all_ids()
+    break_esp = [int(i) for i in break_esp]
+    for post in posts:
+        for num in post.route.split("_")[:-1]:
+            if int(num) in break_esp:
+                print(post)
+                db.session.delete(post)
+                db.session.commit()
 #-------------------------------------------------------------
 
 @app.route('/admin', methods = ["GET", "POST"])
