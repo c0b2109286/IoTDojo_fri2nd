@@ -288,7 +288,7 @@ def foliummap(location):
         folium.PolyLine(locations = [np.float_(get_gps(loc[0])), np.float_(get_gps(loc[1]))], color = "gray").add_to(folium_map)
 
     # 各ノードの番号スタンプを描く
-    for i in range(1,12):
+    for i in range(1,7):
         a = f"./image/num{i}.png"
         icon = CustomIcon(icon_image = a, icon_size = (80, 75), icon_anchor = (35, 35), popup_anchor = (0, 0))
         folium.Marker(location=get_num_gps(i),icon = icon).add_to(folium_map)
@@ -305,7 +305,7 @@ def foliummap(location):
             folium.Circle(location=get_gps(point), radius=12, color = "black", fill = True).add_to(folium_map)
 
         # 各センサからの使用経路を描く
-        for set in [("blue", 5),("#FF7E00", 9), ("#FF18B5", 11)]:
+        for set in [("blue", 3),("#FF7E00", 7)]:
             color, loc_num = set
 
             try:
