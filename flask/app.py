@@ -288,7 +288,7 @@ def foliummap(location):
         folium.PolyLine(locations = [np.float_(get_gps(loc[0])), np.float_(get_gps(loc[1]))], color = "gray").add_to(folium_map)
 
     # 各ノードの番号スタンプを描く
-    for i in range(1,7):
+    for i in range(1,8):
         a = f"./image/num{i}.png"
         icon = CustomIcon(icon_image = a, icon_size = (80, 75), icon_anchor = (35, 35), popup_anchor = (0, 0))
         folium.Marker(location=get_num_gps(i),icon = icon).add_to(folium_map)
