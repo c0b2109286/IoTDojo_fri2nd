@@ -513,14 +513,25 @@ def send():
     global send_list, res, table
     send_list = table
     print(send_list)
-    data = pickle.dumps(send_list)
+    data = None
+    print(len(send_list))
+    for i in range(len(send_list)):
+        if i == len(send_list) - 1:
+            data = data + send_list[i]
+        elif i == 0:
+            data = send_list[i] + ","
+        else:
+            data = data + send_list[i] + ","
     print(data)
+    #data = pickle.dumps(send_list)
+    #print(data)
     if request.method == 'POST':
         res = request.get_json()
         res = str(res["sign"])
         print(res)
     send_list = []
     return {"routedata": str(data)}
+
 
 
 @app.route('/delete')
