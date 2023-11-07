@@ -330,11 +330,6 @@ def foliummap(location):
                 # センサの円を描く
                 folium.Circle(location=get_gps(loc_num), radius=15, color = color, fill = True).add_to(folium_map)
 
-                # タイムアウトしたノードにバツを描く
-                # for node in timeout_node_list:
-                #     #print(f"node={timeout_node_list}")
-                #     icon = CustomIcon(icon_image = "./image/batu.png", icon_size = (50, 50), icon_anchor = (25, 25), popup_anchor = (0, 0))
-                #     folium.Marker(location=get_gps(node),icon = icon).add_to(folium_map)
                 for i in break_esp:
                     break_node=fetch_gps_values(i)
                     print(f"break_node{break_node}")
@@ -343,9 +338,6 @@ def foliummap(location):
 
             except:
                 pass
-
-
-
 
 
     else:
@@ -382,10 +374,6 @@ def foliummap(location):
             print(f"break_node{break_node}")
             icon = CustomIcon(icon_image = "./image/batu.png", icon_size = (50, 50), icon_anchor = (25, 25), popup_anchor = (0, 0))
             folium.Marker(location=break_node,icon = icon).add_to(folium_map)
-        # タイムアウトしたノードにバツを描く
-        # for node in timeout_node_list:
-        #     icon = CustomIcon(icon_image = "./image/batu.png", icon_size = (50, 50), icon_anchor = (25, 25), popup_anchor = (0, 0))
-        #     folium.Marker(location=get_gps(node),icon = icon).add_to(folium_map)
  
 
     # サーバのアイコンを描く
