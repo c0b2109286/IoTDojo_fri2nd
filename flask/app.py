@@ -300,6 +300,13 @@ def foliummap(location):
         judge_num_list = judge_overlap()
         all_node = mk_all_node()
 
+        for point in all_node:
+            if point in [3,7]:
+                icon_toilet_b = CustomIcon(icon_image = "./image/toilet_b.png", icon_size = (50, 50), icon_anchor = (25, 25), popup_anchor = (0, 0))
+                icon_box_o = CustomIcon(icon_image = "./image/box_o.png", icon_size = (50, 50), icon_anchor = (25, 25), popup_anchor = (0, 0))
+                folium.Marker(location=(35.6733595604459, 139.69654794933513),icon = icon_toilet_b).add_to(folium_map)
+                folium.Marker(location=(35.67055065387488, 139.6996917333993),icon = icon_box_o).add_to(folium_map)
+
         # 中継器に黒丸を描く
         for point in all_node:
             folium.Circle(location=get_gps(point), radius=12, color = "black", fill = True).add_to(folium_map)
@@ -350,6 +357,14 @@ def foliummap(location):
         #     color, loc_num = "#FF18B5", 11
 
         route = mk_route(loc_num)
+        all_node = mk_all_node()
+
+        for point in all_node:
+            if point in [3,7]:
+                icon_toilet_b = CustomIcon(icon_image = "./image/toilet_b.png", icon_size = (50, 50), icon_anchor = (25, 25), popup_anchor = (0, 0))
+                icon_box_o = CustomIcon(icon_image = "./image/box_o.png", icon_size = (50, 50), icon_anchor = (25, 25), popup_anchor = (0, 0))
+                folium.Marker(location=(35.6733595604459, 139.69654794933513),icon = icon_toilet_b).add_to(folium_map)
+                folium.Marker(location=(35.67055065387488, 139.6996917333993),icon = icon_box_o).add_to(folium_map)
 
         # 線を引く
         for loc in route:
