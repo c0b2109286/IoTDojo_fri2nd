@@ -70,38 +70,24 @@
     {% if indexga_res<100 %}
     {% if loca_yoyogi=="ALL" %}
     <font size="10">トイレAは{{indextoa_res}}人使用しました。</font><br>
-    <!--<font size="10">トイレBは{{indextob_res}}人使用しました。</font></br>-->
     <font size="10">ゴミ箱は{{indexga_res}}%蓄積されています。</font>
     {% elif loca_yoyogi=="トイレA" %}
     <font size="10" color="red">トイレAは{{indextoa_res}}人使用しました。</font><br>
-    <!--<font size="10">トイレBは{{indextob_res}}人使用しました。</font></br>-->
     <font size="10">ゴミ箱は{{indexga_res}}%蓄積されています。</font>
-    <!--{% elif loca_yoyogi=="トイレB" %}
-    <font size="10">トイレAは{{indextoa_res}}人使用しました。</font><br>
-    <font size="10" color="red">トイレBは{{indextob_res}}人使用しました。</font></br>
-    <font size="10">ゴミ箱は{{indexga_res}}%蓄積されています。</font>-->
     {% elif loca_yoyogi=="ゴミ箱A" %}
     <font size="10">トイレAは{{indextoa_res}}人使用しました。</font><br>
-    <!--<font size="10">トイレBは{{indextob_res}}人使用しました。</font></br>-->
     <font size="10" color="red">ゴミ箱は{{indexga_res}}%蓄積されています。</font>
     {% endif %}
 
     {% else %}
     {% if loca_yoyogi=="ALL" %}
     <font size="10">トイレAは{{indextoa_res}}人使用しました。</font><br>
-    <font size="10">トイレBは{{indextob_res}}人使用しました。</font></br>
     <font size="10"color="red">ゴミ箱は溢れています</font>
     {% elif loca_yoyogi=="トイレA" %}
     <font size="10" color="red">トイレAは{{indextoa_res}}人使用しました。</font><br>
-    <!--<font size="10">トイレBは{{indextob_res}}人使用しました。</font></br>-->
     <font size="10"color="red">ゴミ箱は溢れています</font>
-    <!--{% elif loca_yoyogi=="トイレB" %}
-    <font size="10">トイレAは{{indextoa_res}}人使用しました。</font><br>
-    <font size="10" color="red">トイレBは{{indextob_res}}人使用しました。</font></br>
-    <font size="10"color="red">ゴミ箱は溢れています</font>-->
     {% elif loca_yoyogi=="ゴミ箱A" %}
     <font size="10">トイレAは{{indextoa_res}}人使用しました。</font><br>
-    <!--<font size="10">トイレBは{{indextob_res}}人使用しました。</font></br>-->
     <font size="10" color="red">ゴミ箱は溢れています</font>
     {% endif %}
     {% endif %}
@@ -115,11 +101,6 @@
     {%else%}
     <input type = "submit" name = "ubtn" value = "トイレA" class="btn_02"></input>
     {%endif%}
-    <!--{% if loca_yoyogi=="トイレB" %}
-    <input type = "submit" name = "ubtn" value = "トイレB" class="btn_ch"></input>
-    {%else%}
-    <input type = "submit" name = "ubtn" value = "トイレB" class="btn_03"></input>
-    {%endif%}-->
     {% if loca_yoyogi=="ゴミ箱A" %}
     <input type = "submit" name = "ubtn" value = "ゴミ箱A" class="btn_ch"></input>
     {%else%}
@@ -162,8 +143,7 @@
         <form action="/" method="POST" autocomplete="off">
         <h1>リセットするトイレを選択してください</h1></br>
         
-          <label ><input type="checkbox" name="reseta" value="1"><font size="5px">トイレA</font></label>
-          <label><input type="checkbox" name="resetb" value="2"><font size="5px">トイレB</font></label></br>
+          <label ><input type="checkbox" name="reseta" value="1"><font size="5px">トイレA</font></label></br>
           
           <label ><font size="5px">Password:</font></label>
           <label><input type="text" class=".btn_01" name="resetp" ></label>
