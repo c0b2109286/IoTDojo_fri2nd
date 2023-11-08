@@ -614,6 +614,7 @@ def resp(text,toileta_num,garbage_num,toiletb_num):
             else:
                 GARBAGE=0
             garbage_num=int(text[2])
+    print(f"ナンバー{garbage_num,GARBAGE}")
     return toileta_num,toiletb_num,garbage_num
 
 def datetime_now():
@@ -691,14 +692,14 @@ def usermap():
             sensor_vals2=sensor.val
         elif sensor.id =="3":
             sensor_vals3=sensor.val
-        print(f"id: {sensor.id}, val: {sensor.val}, date: {sensor.date}, time: {sensor.time}")
+        #print(f"id: {sensor.id}, val: {sensor.val}, date: {sensor.date}, time: {sensor.time}")
     PARA=[sensor_vals1,sensor_vals2,sensor_vals3]
     #print(f"例えば君が{PARA}")
     reset = [request.form.getlist('reseta'),request.form.getlist('resetb'),request.form.get('resetp')]
     PARA,reset,reseta,resetb=reset_toilet(reset,PARA,reseta,resetb)
     
     print(f"例えば君が{PARA,reseta,resetb}")
-    print(f"なぜこうなった{reset}")
+    #print(f"なぜこうなった{reset}")
     #print(f"へぇ{reset,PARA}")
     #text = request.form.getlist('item')
     toileta_num,toiletb_num,garbage_num=resp(PARA,toileta_num,toiletb_num,garbage_num)
@@ -707,6 +708,7 @@ def usermap():
 
     if request.method == 'GET':
         loca_yoyogi = "ALL"
+        
         return render_template('useryoyogi.html',indextoa_res=toileta_num,indextob_res=toiletb_num,indexga_res=garbage_num,loca_yoyogi=loca_yoyogi,dt_now=dt_now)
     
     else:
@@ -740,22 +742,23 @@ def userfoliummap(loca_yoyogi):
         #print(f"どうどう{db.Model}")
         gps_group.append(post.gps.split(","))
         ins_group.append(post.ins)
-    for ins in range(len(ins_group)):
-        if ins_group[ins] =="toilet":
-            if toilet_sum==0:
-                ins_group[ins] ="toileta"
-                toilet_sum+=1
-            elif toilet_sum==1:
-                ins_group[ins] ="toiletb"
-                toilet_sum+=1
-    #print(loca_yoyogi)
+    # for ins in range(len(ins_group)):
+    #     if ins_group[ins] =="toilet":
+    #         if toilet_sum==0:
+    #             ins_group[ins] ="toileta"
+    #             toilet_sum+=1
+    #         elif toilet_sum==1:
+    #             ins_group[ins] ="toiletb"
+    #             toilet_sum+=1
+    #print(f"何故だ江尾{loca_yoyogi}")
 
 
     for gps, ins in zip(gps_group, ins_group):
         
         #print(f"どうどう{gps,ins}")
-        if ins == "toileta":
+        if ins == "toilet ":
             if loca_yoyogi=="ALL" or loca_yoyogi=="トイレA" :
+                #print(f"再起動{TOILETA}")
                 if TOILETA==0 :
                     icon_image = "./image/toilet_b.png"
                 elif TOILETA==1 :
@@ -764,20 +767,21 @@ def userfoliummap(loca_yoyogi):
                     icon_image = "./image/toilet_r.png"
             else:
                 icon_image = "./image/zero.png"
-        elif ins == "toiletb":
-            pass
-            # if loca_yoyogi=="ALL" or loca_yoyogi=="トイレB" :
-            #     if TOILETB==0 :
-            #         icon_image = "./image/toilet_b.png"
-            #     elif TOILETB==1 :
-            #         icon_image = "./image/toilet_o.png"
-            #     elif TOILETB==2:
-            #         icon_image = "./image/toilet_r.png"
-            # else:
-            #     icon_image = "./image/zero.png"
+        # elif ins == "toiletb":
+        #     pass
+        #     # if loca_yoyogi=="ALL" or loca_yoyogi=="トイレB" :
+        #     #     if TOILETB==0 :
+        #     #         icon_image = "./image/toilet_b.png"
+        #     #     elif TOILETB==1 :
+        #     #         icon_image = "./image/toilet_o.png"
+        #     #     elif TOILETB==2:
+        #     #         icon_image = "./image/toilet_r.png"
+        #     # else:
+        #     #     icon_image = "./image/zero.png"
 
-        elif ins == "box":
+        elif ins == "box ":
             if loca_yoyogi=="ALL" or loca_yoyogi=="ゴミ箱A" :
+                #print(f"携帯電話{GARBAGE}")
                 if GARBAGE==0:
                     icon_image = "./image/box_b.png"
                 elif GARBAGE==1:
@@ -790,10 +794,10 @@ def userfoliummap(loca_yoyogi):
                     icon_image = "./image/zero.png"
             if GARBAGE==3:
                 icon_image = "./image/box_r.png"
-        elif ins == "office":
+        elif ins == "office ":
             icon_image = "./image/zero.png"
         # else:
-        #     icon_image = "./image/black.png"
+        #     icon_image = "./image/office.png"
         else:
             icon_image = "./image/zero.png"
         
@@ -806,7 +810,7 @@ def userfoliummap(loca_yoyogi):
             ,popup_anchor = (0, 0)
             )
         folium.Marker(location=gps,icon = icon).add_to(folium_map)
-        
+        #print(f"なんですよね{icon}")
         #folium.Marker(location=gps,icon = icon).add_to(folium_map)
 
     folium_map.save('templates/yoyogimap.html')
