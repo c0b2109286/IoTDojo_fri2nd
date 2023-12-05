@@ -16,7 +16,7 @@
     var socket = io.connect('/');
 
     // サーバーからのイベントをリッスン
-    socket.on('update_data', function(data) {
+    socket.on('update_route', function(data) {
         location.reload();  // ページをリロード
     });
 </script>
