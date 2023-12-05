@@ -487,9 +487,18 @@ def receive_data():
             
             # 同じIDのデータがすでに存在する場合、それを削除
             c.execute("DELETE FROM sensor WHERE id = ?", (dtci[0],))
+            row = c.fetchone()
+            print(f"攻略できるかな{row}")
+            
+            if row is not None:
+                # 既存のval値に加算
+                new_val = row[0] + dtci[1]
+                # 更新されたval値でデータを更新
+                c.execute("UPDATE sensor SET val = ?, date = ?, time = ? WHERE id = ?", (new_val, formatted_date, formatted_hour, dtci[0]))
 
-            # 新しいデータを挿入
-            c.execute("INSERT INTO sensor VALUES (?, ?, ?, ?)", (dtci[0], dtci[1], rea[0], rea[1]))
+            else:
+                # 新しいデータを挿入
+                c.execute("INSERT INTO sensor VALUES (?, ?, ?, ?)", (dtci[0], dtci[1], rea[0], rea[1]))
 
             # 変更をコミット（保存）
             conn.commit()
@@ -603,7 +612,7 @@ def resp(text,toileta_num,garbage_num,toiletb_num):
         toiletb_num=int(text[1])
     if len(text)>=2:
         if text[2]!="":
-            text[2]=str(round(int(text[2])/4))
+            text[2]=str(round(int(text[2])))
             #print(f"これが知りたいのさ２{text[2]}")
             if int(text[2])>=30 and int(text[2])<70:
                 GARBAGE=1
