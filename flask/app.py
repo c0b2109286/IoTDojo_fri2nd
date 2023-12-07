@@ -455,6 +455,7 @@ def receive_data():
             new_route = route(id = route_id,route=data)
             db.session.add(new_route)
             db.session.commit()
+        socketio.emit('update_route', {'data': 'your_data_here'})
         
     else:
         try:
