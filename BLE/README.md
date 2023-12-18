@@ -1,177 +1,69 @@
-# BLE
-## Overview
-`relay01_dev`，`relay02_dev`，`senser_dev`それぞれをESP32で実行することでBLEマルチホップ通信が可能．また，`demo_server`を自身のコードエディタの環境内で実行することでFlaskサーバを立ててデータを受け取り，そのデータをhtmlに埋め込むことで確認することが出来る．
-### [relay01_dev](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/relay01_dev)
-中継器として`senser_dev`から受信したデータを`relay01_dev`へ送信したり，経路データから経路表を作成する．
-### [relay02_dev](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/relay02_dev)
-中継器として`relay01_dev`から受信したデータをサーバへ送信する．
-### [senser_dev](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev)
-送信機としてセンサーでデータを取得したり，取得データを`relay01_dev`へ送信したりする．  
-また，経路データから経路表の作成を行う．
-### [demo_server](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/demo_server)
-Flaskサーバを立ち上げ，`relay02_dev`からデータを受け取る．
-また，データをテンプレートのhtml`view.html`に埋め込むことでwebページとして閲覧が可能となる．
-## MindMap
-<img src="png/mindmap.png" width="700">
+# ESP32
+### 概要
+本アプリケーションにおいて，ESP32はセンサデバイスからサーバまでの通信経路の構築とトイレの利用人数とゴミ箱の堆積率のデータを取得し，サーバまで送信を行う．サーバまで送信されたデータは処理された後にダッシュボードで可視化されて施設管理の効率化と機器管理に役立てられる．トイレの利用人数とゴミ箱の堆積率のデータは距離センサから取得した値を用いている．  
+サーバ側のプログラムは[flask](https://github.com/Fel615/IoTDojo_fri2nd/tree/main/flask)に詳細が記載されている．また，主な使用言語は`MicroPython`である．
 
-## BLE通信 役割
-各機器の動作は主に機器間におけるBLE通信によるデータの送受信であり，特定の機器ではデータの計測やサーバへのデータの送受信が行われる．  
-- Peripheral(ペリフェラル)  
-親機(送信側)としての動作，`～peripheral`と名の付くファイルが該当．  
-- Central(セントラル)  
-子機(受信側)としての動作，`～central`と名の付くファイルが該当．  
-- Get  
-モジュールを用いて距離データの取得を行う，`get`と名の付くファイルが該当．  
-- Makeroute  
-経路表の作成を行う，`makeroute`と名の付くpythonが該当．
-- Manegement  
-1デバイスで順々に行われる動作を統括する． `manegement`と名の付くファイルが該当． 
+### ディレクトリ
+・直下のディレクトリの概要  
+1. **relay01**: サーバ/中継器 双方と通信を行う中継器1．  
+2. **relay02**: センサ/中継器 双方と通信を行う中継器2．  
+3. **relay04**: センサ/中継器/サーバ と通信を行う中継器4．  
+4. **relay05**: センサ/中継器 双方と通信を行う中継器5．  
+5. **relay06**: センサ/中継器 双方と通信を行う中継器6．  
+6. **senser1**: トイレの利用人数データを中継器を通してサーバまで送信する．デバイス名3．  
+7. **senser2**: ゴミ箱の堆積率データを中継器を通してサーバまで送信する．  デバイス名7．
 
-## 詳細
-各役割において共通する動作が多い．それぞれを抜粋して説明を行う．
-### 1, Peripheral  
-#### Overview
+・直下の各ディレクトリ内に存在するディレクトリ
+1. **data**: 経路表などを保存する．  
+2. **info**: デバイスの基本情報を保存する．  
 
-1, サーバへの通信時に経由する機器の名前を取得し，中継した機器の数と共にデータを送信する．  
-2, センサモジュールで取得した距離データを経路表に則り，サーバまで送信する．  
+### ファイル
+・直下ディレクトリ内に存在するファイルの概要
+1. **BLE_advertising.py**: BLEデバイスのAdvertising Payloadを生成する．
+2. **_central.py**: スキャンを行い，Advertising Payloadを受信する．
+3. **_peripheral.py**: Advertising Payloadを通じて周囲に情報をブロードキャストする．
+4. **boot.py**: wifi接続を担う．
+5. **distance_manegement.py**: 距離センサのデータ送受信を一括管理する．
+6. **distance_sendtoserver.py**: センサデータをサーバへ送信する．
+7. **led.py**: 外部接続をしたLEDの光り方を制御，確認する．
+8. **makeroute**: 経路情報やデバイス情報から経路表を作成する．
+9. **manegement.py**: 各デバイスの処理を一括管理する．
+10. **mode_change.py**: Advertising Payloadを受け取る条件分岐を行う．
+12. **routedata_getfromserver.py**: 経路データをサーバから取得する．
+13. **routedata_sendtoserver.py**: 経路データをサーバへ送信する．
+14. **route_manegement.py**: 経路データの送受信を一括管理する．
 
-該当file：
-[routedata_peripherals1.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/routedata_peripherals1.py) / 
-[senddistance_peripherals1.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/senddistance_peripherals1.py) / [routedata_peripheral01.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/relay01_dev/routedata_peripheral01.py) / 
-[senddistance_peripheral01.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/relay01_dev/senddistance_peripheral01.py)  
-主な import file : 
-[BLE_advertising](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/BLE_advertising.py) /
-[manegement_s1](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/manegement_s1.py) 
+・ディレクトリ"data"内に存在するファイル．  
+1. **packet_table.json**: 経路表を作成する際に用いるデータを保存．
 
-#### Code
-- def _payload_1() / def _payload_2()  
-機器がアドバタイズを行う際のペイロードを作成し，それを設定する．  
-_payload_1 : パケットのペイロード(データ部分)を格納する変数．
-- ペイロードにはデバイス名とサービスUUIDを含む．
-> UUID : BLEデバイスやサービスを識別するための一意の識別子．
-``` python senser_dev/routedata_peripherals1.py
-def _payload_1(self, name):
-    self._name = name
-    self._payload_1 = advertising_payload(
-        name=name, services=[_Dev_Info_UUID], appearance=0)
-    self._advertise()
-```
+・ディレクトリ"info"内に存在するファイル．  
+1. **DNXX.json**: デバイス情報や様々な条件で使い分けるパケット名を保存．(XXは各デバイス番号)
 
-- def _irq()
-機器がセントラルとの接続状態を管理する為のイベント処理．  
-> _IRQ_CENTRAL_CONNECT : 接続イベント  
-> _IRQ_CENTRAL_DISCONNECT : 切断イベント  
-> _IRQ_GATTS_INDICATE_DONE : 通知完了イベント
-``` python senser_dev/routedata_peripherals1.py
-if event == _IRQ_CENTRAL_CONNECT:　
-    conn_handle, _, _ = data
-    self._connections.add(conn_handle)
-    # 接続後，アドバタイズを終了する．
-    self._check = True
-elif event == _IRQ_CENTRAL_DISCONNECT:
-    conn_handle, _, _ = data
-    self._connections.remove(conn_handle)
-    # 新しい接続を許可するために再びアドバタイズを開始する．
-    self._check = False
-    self._advertise()
-elif event == _IRQ_GATTS_INDICATE_DONE:
-    conn_handle, value_handle, status = data
-```
+### 特徴
+1. **経路構築**: 本システムはセンサデータを送信する為に各センサデバイスからサーバまでの経路構築を順に行う．経路構築の為の通信では"センサ名_中継器名_サーバ名_ホップ数"というデータが送信される．ホップ数とはセンサからサーバへデータを送信する際に中継した中継器の数としている．本システムではホップ数とサーバへのデータ到着順で経路の優先度としており，複数存在する経路を管理している．
 
+2. **センサデータ取得**: 本システムは距離センサ`vL53L0X使用レーザ測距センサモジュール（ToF）`を用いてトイレとゴミ箱で計測を行い必要に応じて加工した後"センサ名_データ_壊れた中継器(デフォルトは0)"に代入して定期送信を行う．  
+→ ゴミ箱ではゴミの堆積量を取得することが求められている．上蓋から下に距離を計測し，測定した距離を"センサ名_距離_壊れた中継器(デフォルトは0)"というデータに代入してサーバまで送信する．  
+→ トイレでは利用人数のデータが必要一定時間中に0.5秒毎に距離を計測し，その距離が7割以下となった際に人が通過したと認識し，カウントを増やす．トイレに入った人は必ず出て行くのでカウントを2で割った値が大まかな利用人数と言える．この値を"センサ名_人数_壊れた中継器(デフォルトは0)"というデータに代入してサーバまで送信する．
 
-### 2, Central
-#### Overview
-サーバから送られてくる通信経路表を作成する為のデータを取得する.  
-該当file : 
-[routeget_centrals1.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/routeget_centrals1.py) / 
-[routedata_central01.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/relay01_dev/routedata_central01.py) / 
-[senddistance_central01.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/relay01_dev/senddistance_central01.py) / 
-[routedata_central02.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/relay02_dev/routedata_central02.py) / 
-[senddistance_central02.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/relay02_dev/senddistance_central02.py)  
-主な import file : 
-[BLE_advertising](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/BLE_advertising.py) /
-[manegement_s1](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/manegement_s1.py)
+### 主要機能
+#### Central
+1. **BLEDevCentral** centralクラス  
+   1.1. **__init__** 初期化関数  
+   1.2. **_reset** 値のリセット関数  
+   1.3. **_irq** イベント処理関数  
+   1.4. **is_connected** 接続確立確認関数  
+   1.5. **scan** Advertising Payloadを受信する関数  
+   1.6. **not_scan** 受信を停止する関数  
+   1.7. **connect** デバイスに接続する関数  
+   1.8. **disconnect** デバイスから切断する関数  
+   1.9. **read** データを読み込み，コールバックを呼び出す関数  
+   1.10. **on_notify** デバイスからの通知時の関数  
+   1.11. **_update_value** データのアップデートを行う関数  
+   1.12. **vlue**　取得データを返す関数  
+   
+   
 
-- handle  
-  BLE機器との通信でリソースや属性(キャラクタリスティック)を識別，管理する為の識別子  
-  > ・_comm_handle : 接続ハンドル(接続中のデバイスを特定するため)  
-  > ・_start_handle / _end_handle : サービスに関連付けされた属性の範囲を識別．  
-  > ・_value_handle : 特定の属性の値にアクセスするための識別子．  
-  (データの読み取り/通知の受信)
-
-#### Code
-BLEデバイスからのデータを読み取るために，print関数をコールバックとして使用する．
-適切に処理する為にカスタムコールバック関数が用いられる．
-```python senser_dev/routeget_centrals1.py
-def read(self, callback):
-    if not self.is_connected():
-        return
-    self._read_callback = callback
-    self._ble.gattc_read(self._conn_handle, self._value_handle) # リモート読み込み
-    # ...
-def Centr():
-    # ...
-    count = 0
-    while count < 3:
-        # BLEデバイスからのデータを読み取り、print関数をコールバックとして指定
-        central.read(callback=print)  
-        print("#####")
-        utime.sleep_ms(2000)
-        count += 1
-        print(count)
-```
-> binascii.hexlify は、バイナリデータを16進数文字列に変換する関数です．これにより、バイナリデータを人間が読み取りやすい形式に変換できます．  
-> binascii.unhexlify はその逆の処理を行います。16進数文字列をバイナリデータに戻します．  16進数文字列からバイナリデータへの変換を行うために使用されます．  
-
-### 3, Get
-#### Overview
-送信機の役割を持つデバイス用のコード．センサーでのデータ収集と送信などを行う．  
-距離センサによって距離(mm)を計測し，結果をreturnする．  
-該当 file : 
-[get_s1.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/get_s1.py) / 
-主な import file: [vl53l1x](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/vl53l1x.py)
-#### Code  
-`get_s1.py`のコメントアウトに記載．
-
-
-### 4, Makeroute
-#### Overview
-受け取った経路データを用いて経路表を作成する．  
-該当 file : 
-[makeroute_s1.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/makeroute_s1.py) / 
-[makeroute_01.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/relay01_dev/makeroute_01.py)
-主な import file : 
-[makeroute_data.txt](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/data/makeroutedata_s1.txt) /
-[packet_table.json](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/data/packet_table.json)
-#### Code
-`makeroute_s1.py`のコメントアウトに記載．
-
-### 5, Manegement
-#### Overview
-センサデバイスの動作を統括する．  
-該当 file : 
-[manegment_s1.py](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/manegment_s1.py)
-
-import file : 
-[routedata_peripherals1](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/routedata_peripherals1.py) /
-[routeget_centrals1](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/routeget_central_s1.py) / 
-[senddistance_peripherals1](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/senddistance_peripherals1.py) / 
-[makeroute_s1](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/makeroute_s1.py) / 
-[get_s1](https://github.com/Fel615/IoTDojo_fri2nd/blob/main/BLE/senser_dev/get_s1.py)
-
-#### Code
-デバイスの基本情報を定義する．  
-> デバイス番号...　各デバイスの判別，経路データ．  
-> パケット名...　受け取るデータの選別．  
-> 用途(センサ or 中継器)...　経路表のkey → 経路選択．  
-```python senser_dev/manegment_s1.py
-def nameinfo():
-    dev_name = 8 # デバイス番号
-    return dev_name
-def packetinfo():
-    dev_packet = "esp32-1A" # パケット名
-    return dev_packet
-def positioninfo():
-    dev_position = "senser01" # 用途
-    return dev_position
-```
+### 参考文献
+- [ubluetooth -- 低レベル Bluetooth - MicroPython - Read the Docs](https://micropython-docs-ja.readthedocs.io/ja/v1.16ja/library/ubluetooth.html)
+- [VL53L0X使用　レーザー測距センサモジュール（ToF）](https://akizukidenshi.com/catalog/g/gM-12590/)
