@@ -61,18 +61,18 @@
 git clone https://github.com/Fel615/IoTDojo_fri2nd
 ```
 ### ESP32側のセットアップ
-- [BLE](#https://github.com/Fel615/IoTDojo_fri2nd/tree/main/BLE)
+- [BLE](https://github.com/Fel615/IoTDojo_fri2nd/tree/main/BLE)
 ### サーバ側のセットアップ
-- [Flask](#https://github.com/Fel615/IoTDojo_fri2nd/tree/main/flask)
+- [Flask](https://github.com/Fel615/IoTDojo_fri2nd/tree/main/flask)
 
 
 
 ## 開発者
 ### 実機側開発者
-- [xu](#https://github.com/c0b2107561)
+- [xu](https://github.com/c0b2107561)
 ### サーバ側開発者
-- [Fel](#https://github.com/Fel615)
-- [tori](#https://github.com/c0b2109286)
+- [Fel](https://github.com/Fel615)
+- [tori](https://github.com/c0b2109286)
 
 
 
