@@ -1,6 +1,0 @@
-{
-  "device_number" : "1",
-  "packet_name_distance" : "esp32_relay1",
-  "packet_name_routeTS" : "relay1_toserver",
-  "packet_name_routeTD" : "relay1_todevice"
-}
