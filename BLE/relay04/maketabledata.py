@@ -36,5 +36,5 @@ def MakeData(fn, all_data,orthopedy_data):
 if __name__ == "__main__":
     all_data = "data/routetabledata.txt"
     orthopedy_data = 'data/makeroute_data.txt'
-    fn = 'info/DN03.json'
+    fn = 'info/DN04.json'
     MakeData(fn, all_data,orthopedy_data)
