@@ -1,8 +1,0 @@
-{
-    "device_number" : "7",
-    "packet_name" : "esp32_relay7",
-    "packet_routeTS" : "relay7_toserver",
-    "packet_routeTD" : "relay7_todevice"
-  }
-  
-  

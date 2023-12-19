@@ -1,6 +1,0 @@
-{
-    "device_number" : "8",
-    "packet_name" : "esp32_relay8",
-    "packet_routeTS" : "relay8_toserver",
-    "packet_routeTD" : "relay8_todevice"
-  }
