@@ -5,8 +5,8 @@ import routedata_getfromserver
 #import sqlite3
 
 
-def send(senddata):
-    url = 'http://[IP]:5000/data' #wifi環境をflaskと一致させる
+def send(senddata, url):
+    url = url + '/data' #wifi環境をflaskと一致させる
     
     # 送信データ
     sendData = {"message": senddata}
@@ -22,5 +22,6 @@ def send(senddata):
 if __name__ == '__main__':
     #dt = "5_0_0_0" #time_out
     dt = "3_2_1_2"
-    send(dt)
+    url = 'http://192.168.14.73:5000'
+    send(dt, url)
     print("end")
