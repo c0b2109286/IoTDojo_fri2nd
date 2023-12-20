@@ -19,19 +19,19 @@ blue_led = machine.Pin(blue_pin, machine.Pin.OUT)
 fn = 'info/DN02.json'
 
 class ManagementRoute():
-    # センサデバイスの行う動作を纏めたクラス.
-    # Manegmentクラスを定義して経路データの送受信と書き込み(，確認)を行う各モジュールを呼び出すdef関数を定義する．
+    # Class that collect the action performed by the senser device.
+    # Define functions to call each module that sends, receives, and writes route data.
     
     def _RoutedataCatch(self, fn, blue_led, mode):
         #RD = routedata_central.Centr()
         RD = _central.centr(fn, blue_led, mode)
         return RD
     
-    def _RoutedataSend(self, fn, data, blue_led, mode,time): # 経路データの送信
+    def _RoutedataSend(self, fn, data, blue_led, mode,time):
         connection = _peripheral.periph(fn, data, blue_led, mode, time)
         return connection
         
-    def _RoutedataGet(self,fn, blue_led, mode): # 経路表作成用のデータ取得
+    def _RoutedataGet(self,fn, blue_led, mode):
         #routedata = routeget_central.Centr(blue_led)
         routedata = _central.centr(fn, blue_led, mode)
         #print(routedata)
@@ -40,7 +40,7 @@ class ManagementRoute():
     def _MakeTableData(self, fn, all_data,orthopedy_data):
         maketabledata.MakeData(fn, all_data,orthopedy_data)
 
-    def _MakeRouteTable(self,fntxt,fnjson): # 経路表作成
+    def _MakeRouteTable(self,fntxt,fnjson):
         makeroute._routemake(fntxt,fnjson)
         
     def _RoutedataBack(self, fn, data, blue_led, mode,time):
