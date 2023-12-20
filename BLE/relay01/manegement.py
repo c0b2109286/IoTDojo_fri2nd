@@ -1,113 +1,206 @@
-import ujson
-from collections import OrderedDict
+import _peripheral
+import _central
+import distance_sendtoserver
+import routedata_sendtoserver
+import routedata_getfromserver
+import makeroute
+import ubinascii
+import json
+import machine
+import time
+from machine import Pin, Timer
+import micropython,time
+import _thread
 
-class RouteMake:
-    def _readtxt(self,fntxt):
-        # テキストファイルからデータを読み込んでlistにする.
-        split = []
-        with open(fntxt,'r',encoding="utf-8")as f:
-            data = f.readlines()
-            for i in range(len(data)):
-                # if data[i] in '\n':
-                #     data[i].replace('\n' , '')
-                data[i] = data[i].split('_')
-                for j in range(len(data[i])):
-                    #print(data[0][0])
-                    if '\r' in data[i][j]:
-                        data[i][j] = data[i][j].replace('\r', '')
-                    if '\n' in data[i][j]:
-                        data[i][j] = data[i][j].replace('\n', '')
-                split.append(data[i])
-            print(split)
-            f.close()
-            return split
-        
-    def _makeval(self,split):
-        # JSONファイルから値を取得して二重リストを作成する.
-        with open("data/packet_table.json", 'r', encoding="utf-8") as f:
-            table= ujson.load(f)
-            print("@@@@@")
-            print(table)
-            print(split)
-            print(type(table))
-            # for key in table.keys():
-            #     print(key)
-            print('---------')
-            lis = []
+red_pin = 13
+red_led = machine.Pin(red_pin, machine.Pin.OUT)
+green_pin = 14
+green_led = machine.Pin(green_pin, machine.Pin.OUT)
+blue_pin = 15
+blue_led = machine.Pin(blue_pin, machine.Pin.OUT)
 
-            for i in range(len(split)):
-                ls = []
-                for list in split[i][:-2]:
-                    print(list)
-                    # print(type(list))
-                    ls.append(table[list])
-                lis.append(ls)
-            print(lis)
-            return lis
+fn = 'info/DN01.json'
+url = 'http://192.168.60.73:5000'
 
-    def _makekey(self, lis):
-        # _makeval関数にて作成したリストから辞書のキーとなる二重リストを作成する．
-        print("$$$$$$$$$")
-        _lis = []
-        for i in range(len(lis)):
-            _ls = []
-            for j in range(len(lis[i])):
-                if j == 0:
-                    _ls.append('senser'+ str(i) + str(j))
-                else:
-                    _ls.append('relay'+ str(i) + str(j))
-            _lis.append(_ls)
-        print(_lis)
-        return _lis
-
-    def _dict(self,split, val, key):
-        # _makeval関数と_makekey関数によって作成したリストを用いて辞書を生成する．
-        print("##########")
-        print(val)
-        print(key)
-        dic = OrderedDict() #順序付き辞書の作成
-        for i in range(len(key)):
-            print(key[0])
-            if i is 0:
-                dic.update(OrderedDict(zip(key[i],val[i])))
-                print(dic)
-                print("&&&&&")
-                hopnum = split[i][-2]
-                dic['hop'+str(i)] = hopnum
-                rank = split[i][-1]
-                dic['rank'+str(i)] = rank
-                print(dic)
-            else:
-                dic.update(OrderedDict(zip(key[i],val[i])))
-                print("######")
-                print(dic)
-                hopnum = split[i][-2]
-                dic['hop'+str(i)] = hopnum
-                rank = split[i][-1]
-                dic['rank'+str(i)] = rank
-                print(dic)
-        return dic
+class Management():
     
-    def _json(self, dic, fnjson):
-        # _dict関数によって作成したリストをJSONファイルに書き込む．
-        with open(fnjson,'w',encoding="utf-8") as f:
-            num = len(dic)
-            print(num)
-            #json.dump(dic,f,indent=num)
-            ujson.dump(dic,f)
-            f.close()
+    def _LEDRESET(self):
+        global red_led, green_led, blue_led
+        red_led.off()
+        green_led.off()
+        blue_led.off()
+        
+    
+    def _RoutedataGet(self, fn, _led, mode):
+        get = _central.Centr(fn, _led, mode)
+        return get
+        
+    def _RoutedataSendtoServer(self,senddata, url):
+        routedata_sendtoserver.send(senddata, url)
+        
+    #実際に受け取るときには必要
+    def _RouteGetFromServer(self, url):
+        GS = routedata_getfromserver.get(url)
+        return GS
+            
+    def _SendRouteForDevice(self, fn, routedata, _led, mode, timeout):
+        _peripheral.periph(fn, routedata, _led, mode, timeout)
+        
 
-
-def _routemake(fntxt,fnjson): #main関数
-    rm = RouteMake()
-    split = rm._readtxt(fntxt)
-    val = rm._makeval(split)
-    key =rm._makekey(val)
-    dic = rm._dict(split,val,key)
-    rm._json(dic,fnjson)
-
-
+    def _MakeRouteTable(self,data):
+        makeroute._routemake()
+        
+    def SenserdataGet(self, fn, _led, mode):
+        distance = _central.Centr(fn, _led, mode)
+        return distance
+        
+    def SenserdataSend(self,distance, url):
+        distance_sendtoserver.send(distance, url)
+        
+    
 if __name__ == "__main__":
-    fntxt = "data/makeroute_data.txt"
-    fnjson = "data/routeinfo.json"
-    _routemake(fntxt, fnjson)
+    mg = Management()
+    connection_list = []
+    lsls = True
+    mess = None
+    
+    Pmode_change = 0
+    Cmode_change = 0
+    
+    micropython.alloc_emergency_exception_buf(100)
+    oneShotTimer = Timer(0)
+    
+    def ROUTECODE():
+        global mess, lsls, red_led, Cmode_change
+        #while mess is None:
+        for i in range(2):
+            
+            if lsls is False:
+                print("終了です")
+                break
+            
+            routedata = mg._RoutedataGet(fn, red_led, Cmode_change)
+            
+            print("受信中")
+            
+            #_thread.start_new_thread(thread1_1, ())
+            #_thread.start_new_thread(thread1_2, ())
+        
+            jf_open = open('info/DN01.json', 'r')
+            jf_load = json.load(jf_open)
+            gapname = jf_load["device_number"]
+            
+            print("+*+*+*+*+*+*+*")
+            print(routedata)
+
+            route = routedata + '_' + str(gapname)
+        
+            print(route)
+            print(len(route))
+            if len(route) is 3:
+                hop = len(route) - 2
+            if len(route) is 5:
+                hop = len(route) - 3
+            if len(route) is 7:
+                hop = len(route) -4
+            if len(route) is 9:
+                hop = len(route) -5
+
+            senddata = str(route) + '_' + str(hop)
+            print(senddata)
+        
+            response = mg._RoutedataSendtoServer(senddata, url)
+            
+            Cmode_change += 1
+            
+    def Return(timer,message="時間が経ちました"):
+        global mess
+        mess = message
+        print(mess)
+    
+    def TIMER(TM=10000): #10秒のtimer
+        global mess
+        oneShotTimer.init(mode=Timer.ONE_SHOT, period=TM, callback=Return)
+        #_thread.exit()
+        
+    def TIMER1(TM=15000): #10秒のtimer
+        global mess
+        oneShotTimer.init(mode=Timer.ONE_SHOT, period=TM, callback=Return)
+        
+    
+    print ("タイマーを開始します")
+    _thread.start_new_thread(TIMER,())
+    _thread.start_new_thread(ROUTECODE,())
+        
+    mainLoop=0
+        #while mainLoop < 10:
+    #while mess is None:
+    for i in range(10): 
+        mainLoop += 1
+        print("MAIN:", mainLoop)
+        time.sleep_ms(1000)
+        i += 1
+        if mainLoop is 10:
+            lsls = True
+            green_led.off()
+        
+    senser1 = "3_0_0"
+    stop = str(senser1) + "_" + "0"
+    responce = mg._RoutedataSendtoServer(stop, url)
+    
+    print("print")
+    routetabledata = mg._RouteGetFromServer(url)
+    
+    for i in range(2):
+        mg._SendRouteForDevice(fn, routetabledata, blue_led, Pmode_change, 20)
+        Pmode_change += 1
+        
+    #Cmode_change += 1 #Cmod:1
+    
+    time.sleep(30)
+    
+    print ("タイマーを開始します")
+    _thread.start_new_thread(TIMER1,())
+    _thread.start_new_thread(ROUTECODE,())
+    
+    
+    mainLoop=0
+        #while mainLoop < 10:
+    #while mess is None:
+    for i in range(15): 
+        mainLoop += 1
+        print("MAIN:", mainLoop)
+        time.sleep_ms(1000)
+        i += 1
+        if mainLoop is 15:
+            lsls = True
+            green_led.off()
+    
+    
+    senser1 = "7_0_0"
+    stop = str(senser1) + "_" + "0"
+    responce = mg._RoutedataSendtoServer(stop, url)
+    
+    time.sleep(3)
+    
+    print("print")
+    routetabledata = mg._RouteGetFromServer(url)
+    
+    print(routetabledata)
+    print(type(routetabledata))
+    
+    mg._SendRouteForDevice(fn, routetabledata, blue_led, Pmode_change, 30)
+    Pmode_change += 1 #Pmode:3
+    
+    
+    utime.sleep(10)
+    print("distance")
+    
+    Cmode_change = 5 #Cmod:2
+        
+    for i in range(3):
+        distance = mg.SenserdataGet(fn, red_led, Cmode_change)
+        mg.SenserdataSend(distance, url)
+        #Cmode_change += 1
+        utime.sleep(10)
+    print("end_point")
