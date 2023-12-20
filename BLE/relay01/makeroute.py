@@ -108,6 +108,6 @@ def _routemake(fntxt,fnjson): #main関数
 
 
 if __name__ == "__main__":
-    fntxt = "data/makeroute_data.txt"
+    fntxt = "data/routetabledata.txt"
     fnjson = "data/routeinfo.json"
     _routemake(fntxt, fnjson)
