@@ -1,40 +1,79 @@
-import bluetooth
-import random
-import struct
-import utime
+import route_manegement
+import distance_manegement
+import condition_manegement
 import ubinascii
-import micropython
-import machine
-# import manegement_s1
-import info
-import json
-import os
-
-def MakeData(fn, all_data,orthopedy_data):
     
-    jf_open = open(fn, 'r')
-    jf_load = json.load(jf_open)
-    gapname = jf_load["device_number"]
+def MG():
     
-    with open(all_data, 'w', encoding='utf-8')as f1:
-        with open(orthopedy_data,'r+',encoding='utf-8')as f2:
-            d = f2.readlines()
-            f2.seek(0)
-            tabledata = ""
-            for i in d:
-                if gapname in i[:-2]:
-                    tabledata += i
-                print(d)
-                print("****")
-            print(tabledata)
-            f2.close()
-            #f.truncate(0)
-        #os.remove('data/makeroute_data.txt')
-        f1.write(tabledata)
-        f1.close()
-
-if __name__ == "__main__":
-    all_data = "data/routetabledata.txt"
-    orthopedy_data = 'data/makeroute_data.txt'
+    mode_change = ()
+    Pmode_change = 0
+    Cmode_change = 0
     fn = 'info/SN01.json'
-    MakeData(fn, all_data,orthopedy_data)
+    condition1 = 0
+    condition2 = 0
+    
+    #センサー役割
+    mode_change = route_manegement.MGRoute(fn, Pmode_change, Cmode_change,condition2)
+    condition2 += 1
+    print("+++++++")
+    print(mode_change)
+    
+    Pmode_change = mode_change[0] #Pmode 1
+    Cmode_change = mode_change[1] #Cmode 2
+    
+    #経路構築開始伝える
+    #mode_change = condition_manegement.MGCondition(fn, Pmode_change, Cmode_change, condition1)
+    Pmode_change += 1
+    print("+++++++")
+    Cmode_change = 2
+    mode_change = (Pmode_change, Cmode_change)
+    print(mode_change)
+    condition1 += 1
+    
+    Pmode_change = mode_change[0] #mode 2
+    Cmode_change = mode_change[1] #mode 2
+    #Pmode_change = 2
+    #Cmode_change = 2
+    
+    utime.sleep(5)
+    
+    #中継器役割
+    #mode_change = route_manegement.MGRoute(fn, Pmode_change, Cmode_change, condition2)
+    utime.sleep(30)
+    #print("+++++++")
+    #print(mode_change)
+    
+    #Pmode_change = mode_change[0] #mode 3
+    #Cmode_change = mode_change[1] #mode 3
+    Pmode_change = 3
+    Cmode_change = 3
+    
+    #距離開始受け取り
+    #mode_change = condition_manegement.MGCondition(fn, Pmode_change, Cmode_change, condition1)
+    Cmode_change += 1
+    print("+++++++")
+    Pmode_change = 3
+    mode_change = (Pmode_change, Cmode_change)
+    print(mode_change)
+    condition1 += 1
+    
+    Pmode_change = mode_change[0] #mode 3
+    Cmode_change = mode_change[1] #mode 4
+    #Pmode_change = 3
+    #Cmode_change = 4
+    
+    #utime.sleep(5)
+    utime.sleep(3)
+    
+    #距離
+    for i in range(2):
+        distance_manegement.MGDist(fn, Pmode_change, Cmode_change)
+        utime.sleep(5)
+    
+    #tuples = (1,2)
+    #t1 = tuples[0]
+    #print(t1) #1
+    
+if __name__ == "__main__":
+    print(ubinascii.hexlify('back'))
+    MG()
