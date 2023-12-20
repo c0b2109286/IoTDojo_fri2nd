@@ -14,6 +14,7 @@ green_led = None
 route = None
 true = False
 data = " "
+path = 'data/makeroute_data.txt'
 
 green_pin = 14
 green_led = machine.Pin(green_pin, machine.Pin.OUT)
@@ -57,9 +58,11 @@ def get(url):
     
     finally:
         true = True
+        with open(path, mode='a') as f:
+            f.write(route)
         print('終了です')
         #_thread.exit()
 
 if __name__ == "__main__":
-    url = 'http://192.168.156.229:5000'
+    url = 'http://192.168.64.229:5000'
     get(url)
