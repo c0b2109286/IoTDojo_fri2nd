@@ -87,16 +87,33 @@ class BLEDevCentral:
             adv = ubinascii.hexlify(adv_data)
             adr = ubinascii.hexlify(addr)
             
+            #print(mode)
+            #print(packet[0])
+            #print(packet[1])
             
-            if packet[0] in adv:
-                adv = str(ubinascii.unhexlify(adv), 'utf-8')
-                print('type:{} addr:{} rssi:{} data:{}'.format(addr_type, adr, rssi, adv))    
-                if adv_type in (_ADV_IND, _ADV_DIRECT_IND) and _Dev_Info_UUID in decode_services(adv_data):
-                    # Found a potential device, remember it and stop scanning.
-                    self._addr_type = addr_type
-                    self._addr = bytes(addr)  # Note: addr buffer is owned by caller so need to copy it.
-                    self._name = adv or "?"
-                    self._ble.gap_scan(None)
+            if mode is 0 or mode is 1 or mode is 2 or mode is 3 or mode is 5:
+                #print("mode 0 or 1 or 3")
+                if packet[0] in adv:
+                    adv = str(ubinascii.unhexlify(adv), 'utf-8')
+                    print('type:{} addr:{} rssi:{} data:{}'.format(addr_type, adr, rssi, adv))    
+                    if adv_type in (_ADV_IND, _ADV_DIRECT_IND) and _Dev_Info_UUID in decode_services(adv_data):
+                        # Found a potential device, remember it and stop scanning.
+                        self._addr_type = addr_type
+                        self._addr = bytes(addr)  # Note: addr buffer is owned by caller so need to copy it.
+                        self._name = adv or "?"
+                        self._ble.gap_scan(None)
+                        
+            if mode is 4 or mode is 6:
+                #print("mode 2 or 4")
+                if packet[0] in adv or packet[1] in adv:
+                    adv = str(ubinascii.unhexlify(adv), 'utf-8')
+                    print('type:{} addr:{} rssi:{} data:{}'.format(addr_type, adr, rssi, adv))    
+                    if adv_type in (_ADV_IND, _ADV_DIRECT_IND) and _Dev_Info_UUID in decode_services(adv_data):
+                        # Found a potential device, remember it and stop scanning.
+                        self._addr_type = addr_type
+                        self._addr = bytes(addr)  # Note: addr buffer is owned by caller so need to copy it.
+                        self._name = adv or "?"
+                        self._ble.gap_scan(None)
                     
         elif event == _IRQ_SCAN_DONE:
             print('Scan compelete')
@@ -267,13 +284,16 @@ def Centr(fn, _led, modechange):
             not_found = True
             print("No sensor found.")
             
-    def led():
+    red_pin = 13
+    red_led = machine.Pin(red_pin, machine.Pin.OUT)
+            
+    def led(red_led):
         red_led.on()
         utime.sleep(1)
         red_led.off()
         utime.sleep(0.5)
             
-    tuple_scantime = (20000, 30000, 30000)
+    tuple_scantime = (60000, 30000, 30000)
     
     central.scan(callback=on_scan, scantime = tuple_scantime) #def scan
     
@@ -302,11 +322,15 @@ def Centr(fn, _led, modechange):
     central.disconnect()
     print("Disconnected")
     
+    red_pin = 13
+    red_led = machine.Pin(red_pin, machine.Pin.OUT)
+    led(red_led)
+    
     return value
 
 if __name__ == "__main__":
     red_pin = 13
     red_led = machine.Pin(red_pin, machine.Pin.OUT)
-    mode_change = 1
+    mode_change = 5
     fn = 'info/DN01.json'
     Centr(fn, red_led, mode_change)
