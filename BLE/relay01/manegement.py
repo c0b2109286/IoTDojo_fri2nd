@@ -46,9 +46,11 @@ class Management():
     def _SendRouteForDevice(self, fn, routedata, _led, mode, timeout):
         _peripheral.periph(fn, routedata, _led, mode, timeout)
         
+    def _MakeTableData(self, fn, all_data,orthopedy_data):
+        maketabledata.MakeData(fn, all_data,orthopedy_data)
 
-    def _MakeRouteTable(self,data):
-        makeroute._routemake()
+    def _MakeRouteTable(self,fntxt,fnjson): # 経路表作成
+        makeroute._routemake(fntxt,fnjson)
         
     def SenserdataGet(self, fn, _led, mode):
         distance = _central.Centr(fn, _led, mode)
@@ -192,6 +194,12 @@ if __name__ == "__main__":
     mg._SendRouteForDevice(fn, routetabledata, blue_led, Pmode_change, 30)
     Pmode_change += 1 #Pmode:3
     
+    all_data = "data/routetabledata.txt"
+    orthopedy_data = 'data/makeroute_data.txt'
+    mg._MakeTableData(fn, all_data, orthopedy_data)
+    fntxt = "data/routetabledata.txt"
+    fnjson = "data/routeinfo.json"
+    mg._MakeRouteTable(fntxt, fnjson)
     
     utime.sleep(10)
     print("distance")
