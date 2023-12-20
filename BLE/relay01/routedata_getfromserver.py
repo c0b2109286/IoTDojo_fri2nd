@@ -29,10 +29,10 @@ def led():
     return true
 
 
-def get():
+def get(url):
     global green_led, route,true
     
-    url = "http://192.168.156.229:5000/send_to_esp"
+    url = url + "/send_to_esp"
     #urequests.head(url)
     print("test")
     
@@ -61,4 +61,5 @@ def get():
         #_thread.exit()
 
 if __name__ == "__main__":
-    get()
+    url = 'http://192.168.156.229:5000'
+    get(url)
