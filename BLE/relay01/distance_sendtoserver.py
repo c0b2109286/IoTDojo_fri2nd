@@ -3,8 +3,9 @@ import json
 import urequests
 
 #def send():
-def send(senddata):
-    url = 'http://[IP]:5000/data' #wifi環境をflaskと一致させる
+def send(senddata, url):
+    url = url + '/data'
+    #url = 'http://192.168.156.229:5000/data' #wifi環境をflaskと一致させる
     
     #with open('sendroutedata.txt', 'r', encoding = 'utf-8')as f:
     #    data = f.read()
@@ -27,4 +28,5 @@ def send(senddata):
 
 if __name__ == '__main__':
     senddata = "test"
-    send(senddata)
+    url = 'http://192.168.156.229:5000'
+    send(senddata, url)
