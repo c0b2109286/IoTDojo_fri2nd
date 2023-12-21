@@ -55,14 +55,14 @@ def MGRoute(fn, Pmode_change,Cmode_change):
     LOAD = ujson.load(OPEN)
     dev_name = str(LOAD['device_number'])
     
-    #mode 0  toserver not senser
+    #Cmode 0  senser1　data catch
     RD = mg._RoutedataCatch(fn, red_led, Cmode_change)
 
     Cmode_change += 1
     
     data = str(RD) + '_' + dev_name
     
-    #mode 0  send to server routedata
+    #Pmode 0  send to server
     data = mg._RoutedataSend(fn, data, blue_led, Pmode_change, 20)
     
     Pmode_change += 1
@@ -70,7 +70,7 @@ def MGRoute(fn, Pmode_change,Cmode_change):
     print("testtest")
     
     utime.sleep(10)
-    #Cmode 1  for senser  return routedata
+    #Cmode Get returned routedata
     route = mg._RoutedataGet(fn, blue_led, Cmode_change)
     Cmode_change += 1
     print(route)
