@@ -4,7 +4,6 @@ import struct
 import utime
 import binascii
 from BLE_advertising import advertising_payload
-# import manegement
 import info 
 import ujson
 import machine
@@ -19,11 +18,11 @@ _FLAG_READ = const(0x0002)
 _FLAG_NOTIFY = const(0x0010)
 _FLAG_INDICATE = const(0x0020)
 
-# デバイス情報サービス
+# device information service
 _Dev_Info_UUID = bluetooth.UUID(0x180A)
-# デバイスの名前
+# device name
 _Dev_CHAR = (bluetooth.UUID(0x2A00),
-    _FLAG_READ | _FLAG_NOTIFY | _FLAG_INDICATE,) # 読み取り，通知，応答要求付き通知
+    _FLAG_READ | _FLAG_NOTIFY | _FLAG_INDICATE,) # read, notify, notify with response request
 _Dev_SERVICE = (_Dev_Info_UUID,(_Dev_CHAR,),)
 
 #blue_pin = 15
@@ -40,9 +39,10 @@ class BLE:
         self._ble.irq(self._irq)
         ((self._handle,),) = self._ble.gatts_register_services((_Dev_SERVICE,))
         self._connections = set()
-        self._check = False
+        self._check = False # connect condition
         self._connect_count = 0
 
+    # payload can't exchange, so increase in number
     def _payload_1(self, name):
         self._name = name
         self._payload_1 = advertising_payload(
@@ -68,7 +68,7 @@ class BLE:
         self._stop2()
 
     def _irq(self, event, data):
-        # 接続を追跡して通知を送信できるようにする．
+        # be able to track connections and send notices.
         if event == _IRQ_CENTRAL_CONNECT:
             conn_handle, _, _ = data
             self._connections.add(conn_handle)
@@ -81,14 +81,12 @@ class BLE:
         elif event == _IRQ_CENTRAL_DISCONNECT:
             conn_handle, _, _ = data
             self._connections.remove(conn_handle)
-            # 新しい接続を許可するために再びアドバタイズを開始する．
             self._check = False
-            #self._advertise()
 
         elif event == _IRQ_PERIPHERAL_DISCONNECT:
             conn_handle, _, _ = data
             self._connections.remove(conn_handle)
-            # 新しい接続を許可するために再びアドバタイズを開始する．
+            # start the advertisement again to allow the new connection
             self._check = False
             self._advertise()
 
@@ -98,14 +96,14 @@ class BLE:
 
     def set_dev_name(self, name, notify=False, indicate=False):
         fm = '{}si'.format(len(name))
-        self._ble.gatts_write(self._handle, struct.pack(fm, name))  # 読み込み可能な書き込み
+        self._ble.gatts_write(self._handle, struct.pack(fm, name))  # Readable write
         if notify or indicate:
             for conn_handle in self._connections:
                 if notify:
-                    # 接続されたセントラルに通知する．
+                    # notify connected central
                     self._ble.gatts_notify(conn_handle, self._handle)
                 if indicate:
-                    # 接続されたセントラルに示す．
+                    # show connected central
                     self._ble.gatts_indicate(conn_handle, self._handle)
 
     def _advertise(self, interval_us=100000):
@@ -141,15 +139,14 @@ def periph(fn, routedata, _led, mode, timeout):
     OPEN = open("data/Routeinfo.json", 'r')
     route = ujson.load(OPEN)
     
-    if mode is 0:
+    if mode is 0: # route data send to server
         data = str(routedata)
         print(data)
         b._payload_1(jf_load["packet_routeTS"])
         print(timeout)
         print(b._connect_count)
         while timeout > 1 or b._connect_count is 0:
-            #if b._check is False and b._connect_count is 0:
-            if b._check is False:
+            if b._check is False: #　Disconnected state
                 i = (i + 1) % 10
                 _led.on()
                 b.set_dev_name(data, notify=i == 0, indicate=False)
@@ -165,11 +162,8 @@ def periph(fn, routedata, _led, mode, timeout):
                 print("終了")
                 _led.off()
                 break
-            #b._payload_3(jf_load["packet_routeTS"])
-            #b.set_dev_name(data, notify=i == 0, indicate=False)
-            #print("終了")
             
-    if mode is 1:
+    if mode is 1: # Send the returned route data to senser1
         print("mode1です")
         data = str(routedata)
         print(data)
@@ -177,7 +171,6 @@ def periph(fn, routedata, _led, mode, timeout):
         print(timeout)
         print(b._connect_count)
         while timeout > 1 or b._connect_count is 0:
-            #if b._check is False and b._connect_count is 0:
             if b._check is False:
                 i = (i + 1) % 10
                 _led.on()
@@ -195,33 +188,26 @@ def periph(fn, routedata, _led, mode, timeout):
                 _led.off()
                 break
             
-    if mode is 2:
+    if mode is 2: # Send the senser data to server
         if b._check is False and flag == 0:
-            #b._payload_1("esp32-3A")
             b._payload_1(route["relay02"])
             while b._check is False and timeout > 0:
-                #Write every second, notify every 10 seconds.
-                #data = set_name + ',' + str_flag
-                #b._name = file["next_1"]
                 data = routedata
                 i = (i + 1) % 10
                 _led.on()
                 b.set_dev_name(data, notify=i == 0, indicate=False)
                 payload = binascii.hexlify(b._payload_1)
                 pay1 = str(binascii.unhexlify(payload), 'utf-8')
-                #pay1 = int(binascii.unhexlify(payload), 16)
                 print(pay1)
-                ##Random walk the temperature.
                 print('.')
-                utime.sleep_ms(500)
+                utime.sleep(0.5)
                 _led.off()
-                utime.sleep_ms(500)
+                utime.sleep(0.5)
                 timeout -= 1
                 if timeout is 0 or b._connect_count is 1:
                     utime.sleep(3)
                     b._payload_4()
                     print("終了")
-                    #mode += 1
                     _led.off()
                     break
 
