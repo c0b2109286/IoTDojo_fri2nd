@@ -156,7 +156,7 @@ class BLEDevCentral:
                 if self._conn_callback:
                     self._conn_callback()
             else:
-                print("Failed to find temperature characteristic.")
+                print("Failed to find characteristic.")
 
         elif event == _IRQ_GATTC_READ_RESULT: # read event
             # A read completed successfully.
