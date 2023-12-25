@@ -62,7 +62,7 @@ def MGRoute(fn, Pmode_change,Cmode_change):
     
     data = str(RD) + '_' + dev_name
     
-    #Pmode 0  send to server
+    #Pmode 0 send to server
     data = mg._RoutedataSend(fn, data, blue_led, Pmode_change, 20)
     
     Pmode_change += 1
@@ -70,7 +70,7 @@ def MGRoute(fn, Pmode_change,Cmode_change):
     print("testtest")
     
     utime.sleep(10)
-    #Cmode Get returned routedata
+    #Cmode1 Get returned routedata
     route = mg._RoutedataGet(fn, blue_led, Cmode_change)
     Cmode_change += 1
     print(route)
@@ -83,20 +83,9 @@ def MGRoute(fn, Pmode_change,Cmode_change):
         
     mg._MakeTableData(fn, all_data, orthopedy_data)
     
-    #Pmode 1 for senser  return routedata
-    #utime.sleep(5)
-    
-    #with open(orthopedy_data, 'w')as f:
-    #    f.write(route)
-    
+    #Pmode 1 Send the returned route data to senser1
     dt = mg._RoutedataBack(fn, route, blue_led, Pmode_change, 20)
     Pmode_change += 1
-    
-    #fntxt = 'data/makeroute_data.txt'
-    #fnjson = 'data/routeinfo.json'
-
-    #mg._MakeRouteTable(fntxt, fnjson)
-    
     
     return Pmode_change, Cmode_change
 
