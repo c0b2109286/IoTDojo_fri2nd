@@ -10,7 +10,7 @@ def MG():
     Cmode_change = 0
     fn = 'info/DN02.json'
     
-    # 中継器1
+    # Perfoem route building
     utime.sleep(3)
     mode_change = route_manegement.MGRoute(fn, Pmode_change, Cmode_change)
     print("+++++++")
@@ -18,8 +18,7 @@ def MG():
     
     utime.sleep(5)
     
-    #中継器2
-    #mode_change = route_manegement.MGRoute(fn, Pmode_change, Cmode_change)
+    # wait for other route building
     utime.sleep(40)
     Pmode_change = 2
     Cmode_change = 2
@@ -28,7 +27,7 @@ def MG():
     
     utime.sleep(10)
     
-    #距離送信
+    # send the senser data to server
     
     utime.sleep(15)
     print("distance")
