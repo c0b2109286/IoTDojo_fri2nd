@@ -82,7 +82,7 @@ def MGRoute(fn, Pmode_change,Cmode_change,condition1):
         all_data = "data/routetabledata.txt"
         orthopedy_data = 'data/makeroute_data.txt'
         
-        #mg._MakeTableData(fn, all_data, orthopedy_data)
+        mg._MakeTableData(fn, all_data, orthopedy_data)
         
         fntxt = 'data/makeroute_data.txt'
         fnjson = 'data/routeinfo.json'
@@ -123,7 +123,7 @@ def MGRoute(fn, Pmode_change,Cmode_change,condition1):
         all_data = "data/routetabledata.txt"
         orthopedy_data = 'data/makeroute_data.txt'
         
-        #mg._MakeTableData(fn, all_data, orthopedy_data)
+        mg._MakeTableData(fn, all_data, orthopedy_data)
         
         fntxt = 'data/makeroute_data.txt'
         fnjson = 'data/routeinfo.json'
