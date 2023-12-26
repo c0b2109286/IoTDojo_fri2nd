@@ -1,3 +1,4 @@
+
 import route_manegement
 import distance_manegement
 import ubinascii
@@ -26,12 +27,10 @@ def MG():
     print(Cmode_change)
     
     utime.sleep(10)
-    
-    # send the senser data to server
-    
     utime.sleep(15)
     print("distance")
-    
+
+    # send the senser data to server
     for i in range(2):
         distance_manegement.MGDist(fn, Pmode_change, Cmode_change)
         utime.sleep(15)
