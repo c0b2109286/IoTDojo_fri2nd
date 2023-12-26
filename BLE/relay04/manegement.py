@@ -1,5 +1,6 @@
 import route_manegement
 import distance_manegement
+import makeroute
 import ubinascii
 import time
 
@@ -28,6 +29,10 @@ def MG():
     print(mode_change)
     Pmode_change = mode_change[0]
     Cmode_change = mode_change[1]
+
+    fntxt = 'data/makeroute_data.txt'
+    fnjson = 'data/routeinfo.json'
+    makeroute._routemake(fntxt, fnjson)
     
     time.sleep(10)
 
