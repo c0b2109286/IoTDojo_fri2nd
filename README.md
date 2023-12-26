@@ -29,7 +29,6 @@
 1. [プロジェクトについて](#プロジェクトについて)
 2. [環境](#環境)
 3. [開発環境構築](#開発環境構築)
-4. [開発者](#開発者)
 
 ## プロジェクトについて
 東京工科大学の戦略的教育プログラムの一環で開発したサービスです。<br>
@@ -66,13 +65,6 @@ git clone https://github.com/Fel615/IoTDojo_fri2nd
 - [Flask](https://github.com/Fel615/IoTDojo_fri2nd/tree/main/flask)
 
 
-
-## 開発者
-### 実機側開発者
-- [xu](https://github.com/c0b2107561)
-### サーバ側開発者
-- [Fel](https://github.com/Fel615)
-- [tori](https://github.com/c0b2109286)
 
 
 
