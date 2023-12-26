@@ -10,8 +10,9 @@ def MG():
     Cmode_change = 0
     fn = 'info/DN04.json'
     condition1 = 0
-    
     mode_change = ()
+    
+    # performe route building
     mode_change = route_manegement.MGRoute(fn, Pmode_change, Cmode_change, condition1)
     print("+++++++")
     print(mode_change)
@@ -20,7 +21,8 @@ def MG():
     condition1 += 1
     
     #time.sleep(5)
-    
+
+    # performe route building
     mode_change = route_manegement.MGRoute(fn, Pmode_change, Cmode_change, condition1)
     print("+++++++")
     print(mode_change)
@@ -28,7 +30,8 @@ def MG():
     Cmode_change = mode_change[1]
     
     time.sleep(10)
-    
+
+    # send the senser data to server
     for i in range(3):
         distance_manegement.MGDist(fn, Pmode_change, Cmode_change)
         utime.sleep(1)
