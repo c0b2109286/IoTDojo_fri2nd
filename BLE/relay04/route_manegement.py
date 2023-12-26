@@ -84,11 +84,6 @@ def MGRoute(fn, Pmode_change,Cmode_change,condition1):
         
         mg._MakeTableData(fn, all_data, orthopedy_data)
         
-        fntxt = 'data/makeroute_data.txt'
-        fnjson = 'data/routeinfo.json'
-
-        #mg._MakeRouteTable(fntxt, fnjson)
-    
     if condition1 is 1:
     #mode 0  toserver not senser
         
@@ -125,11 +120,6 @@ def MGRoute(fn, Pmode_change,Cmode_change,condition1):
         
         mg._MakeTableData(fn, all_data, orthopedy_data)
         
-        fntxt = 'data/makeroute_data.txt'
-        fnjson = 'data/routeinfo.json'
-
-        #mg._MakeRouteTable(fntxt, fnjson)
-    
     print(Pmode_change)
     print(Cmode_change)
     return Pmode_change, Cmode_change
