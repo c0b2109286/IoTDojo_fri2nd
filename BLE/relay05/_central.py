@@ -33,9 +33,9 @@ _ADV_DIRECT_IND = const(0x01)
 _ADV_SCAN_IND = const(0x02)
 _ADV_NONCONN_IND = const(0x03)
 
-# org.bluetooth.service.environmental_sensing
+# org.bluetooth.service.device_information_service
 _Dev_Info_UUID = bluetooth.UUID(0x180A)
-# org.bluetooth.characteristic.temperature
+# org.bluetooth.characteristic.device_name
 _Dev_Name_UUID = bluetooth.UUID(0x2A00)
 _Dev_CHAR = (_Dev_Name_UUID,bluetooth.FLAG_READ | bluetooth.FLAG_NOTIFY,)
 _ENV_SENSE_SERVICE = (_Dev_Info_UUID,(_Dev_CHAR,),)
@@ -112,12 +112,12 @@ class BLEDevCentral:
                     # Scan timed out.
                     self._scan_callback(None, None, None)
 
-        elif event == _IRQ_PERIPHERAL_CONNECT: #gap_connect()が成功しました。
+        elif event == _IRQ_PERIPHERAL_CONNECT: # gap_connect() succeeds
             # Connect successful.
             conn_handle, addr_type, addr = data
             if addr_type == self._addr_type and addr == self._addr:
                 self._conn_handle = conn_handle
-                self._ble.gattc_discover_services(self._conn_handle) #characteristicsについて問い合わせる
+                self._ble.gattc_discover_services(self._conn_handle) # ask about "characteristics"
                 print('peripheral discovered')
 
         elif event == _IRQ_PERIPHERAL_DISCONNECT:
@@ -127,13 +127,13 @@ class BLEDevCentral:
                 # If it was initiated by us, it'll already be reset.
                 self._reset()
 
-        elif event == _IRQ_GATTC_SERVICE_RESULT:#_ble.gattc_discover_servicesy結果より発生する
+        elif event == _IRQ_GATTC_SERVICE_RESULT:# happend from the result of "_ble.gattc_discover_servicesy"
             # Connected device returned a service.
             conn_handle, start_handle, end_handle, uuid = data
             if conn_handle == self._conn_handle and uuid == _Dev_Info_UUID:
                 self._start_handle, self._end_handle = start_handle, end_handle
 
-        elif event == _IRQ_GATTC_SERVICE_DONE: #上のイベントの検索が完了すると発生する
+        elif event == _IRQ_GATTC_SERVICE_DONE: # happens when the search for the above event is complete
             # Service query complete.
             if self._start_handle and self._end_handle:
                 self._ble.gattc_discover_characteristics(
@@ -157,7 +157,7 @@ class BLEDevCentral:
             else:
                 print("Failed to find temperature characteristic.")
 
-        elif event == _IRQ_GATTC_READ_RESULT: #読み込みイベント
+        elif event == _IRQ_GATTC_READ_RESULT: # read event
             # A read completed successfully.
             conn_handle, value_handle, char_data = data
             if conn_handle == self._conn_handle and value_handle == self._value_handle:
@@ -217,7 +217,7 @@ class BLEDevCentral:
         if not self.is_connected():
             return
         self._read_callback = callback
-        self._ble.gattc_read(self._conn_handle, self._value_handle) #リモート読み込み
+        self._ble.gattc_read(self._conn_handle, self._value_handle) # remote read
         return self._read_callback
 
     # Sets a callback to be invoked when the device notifies us.
@@ -226,7 +226,7 @@ class BLEDevCentral:
 
     def _update_value(self, data):
         global value
-        # Data is sint16 in degrees Celsius with a resolution of 0.01 degrees Celsius.
+        # remove data types and useless spaces
         self._value = ubinascii.hexlify(data)
         print(type(self._value))
         #self._value = bytes(self._value)
@@ -259,7 +259,7 @@ def centr(fn, _led, modechange):
     print(packet)
             
 
-    def on_scan(addr_type, addr, name): #scanのcallback
+    def on_scan(addr_type, addr, name): #scan callback
         if addr_type is not None:
             #もし、nameがsenser01なら
             name = ubinascii.hexlify(name)
@@ -279,9 +279,9 @@ def centr(fn, _led, modechange):
         Led.off()
         utime.sleep(0.5)
     
-    tuple_scantime = (20000,30000,30000) #20秒
+    tuple_scantime = (20000,30000,30000) # for 20s
     
-    central.scan(callback=on_scan, scantime=tuple_scantime) #def scan
+    central.scan(callback=on_scan, scantime=tuple_scantime)
     
     while not central.is_connected():
         utime.sleep_ms(1000)
