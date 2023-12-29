@@ -1,13 +1,25 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<title>テスト</title>
-<meta name="description" content="テスト中">
+<title>システム管理者</title>
+<meta name="description" content="システム管理">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="/static/css/style.css">
 {% endblock %}
 
 {% block body %}
+<!-- Socket.IOのクライアントライブラリを追加 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+
+<script>
+    // サーバーに接続
+    var socket = io.connect('/');
+
+    // サーバーからのイベントをリッスン
+    socket.on('update_route', function(data) {
+        location.reload();  // ページをリロード
+    });
+</script>
 
 <div class = "container">
 
@@ -29,10 +41,7 @@
                         <input type = "submit" name = "btn" value = "トイレA" class="btn_02"></input>
                     </li>
                     <li>
-                        <input type = "submit" name = "btn" value = "トイレB" class="btn_03"></input>
-                    </li>
-                    <li>
-                        <input type = "submit" name = "btn" value = "ゴミ箱A" class="btn_04"></input>
+                        <input type = "submit" name = "btn" value = "ゴミ箱A" class="btn_03"></input>
                     </li>
                 </ul>
             </form>
@@ -57,10 +66,9 @@
         <div class="btn_map">
             <input type = "submit" name = "btn" value = "ALL" class="btn_01"></input>
             <input type = "submit" name = "btn" value = "トイレA" class="btn_02"></input>
-            <input type = "submit" name = "btn" value = "トイレB" class="btn_03"></input>
-            <input type = "submit" name = "btn" value = "ゴミ箱A" class="btn_04"></input>
+            <input type = "submit" name = "btn" value = "ゴミ箱A" class="btn_03"></input>
             <div class = "logout">
-                <a href="{{url_for('map')}}">
+                <a href="{{url_for('login')}}">
                     <!--urlはリンク先の関数名-->
                     <button class="favorite styled"
                         type="button" >
@@ -69,7 +77,7 @@
             </div>
         </div>
 
-            <iframe class= "frame_center" src="http://127.0.0.1:5000/map/{{location}}"  style="border-radius: 20px;"></iframe>
+            <iframe class= "frame_center" src="/map/{{location}}"  style="border-radius: 20px;"></iframe>
 
 
     </form>

@@ -1,0 +1,9 @@
+{
+  "device_number" : "4",
+  "packet_name" : "esp32_relay4",
+  "packet_routeTS" : "relay4_toserver",
+  "packet_routeTD" : "relay4_todevice",
+  "packet_routeTSS" : "relay4_forsenser1",
+  "packet_name_routeT5" : "relay4_torelay5",
+  "packet_name_routeT6" : "relay4_torelay6" 
+}

@@ -1,0 +1,10 @@
+{
+    "device_number" : "7",
+    "senser_name" : "7",
+    "packet_name" : "esp32_senser2",
+    "packet_routeTS" : "senser2_todevice",
+    "packet_routeTD" : "senser2_todevice",
+    "packet_routeTSS" : "senser2_forsenser",
+    "packet_routeTSSB" : "senser2_todevback",
+    "packet_call_s" : "senser2_callsenser"
+}

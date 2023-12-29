@@ -1,0 +1,10 @@
+{
+  "device_number" : "5",
+  "packet_name" : "esp32_relay5",
+  "packet_routeTS" : "relay5_toserver",
+  "packet_routeTD" : "relay5_todevice",
+  "packet_routeTSS" : "relay5_forsenser2",
+  "packet_routeTSSB" : "relay5_forsensback",
+  "packet_call_s" : "relay5_callsenser",
+  "packet_tosenser2" : "relay5_tosenser2"
+}

@@ -1,9 +1,0 @@
-{
-    "end": "esp32-4A" , 
-    "next_1" : "esp32-2A", 
-    "hop_1" : "3", 
-    "priority_1" : "1",
-    "next_2" : "esp32-2B", 
-    "hop_2" : "3", 
-    "priority_2" : "1"
-}

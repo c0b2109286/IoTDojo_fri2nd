@@ -2,13 +2,34 @@
 
 {% block head %}
 <title>利用者</title>
+<link rel="icon" href="/image/favicon.ico" type="image/x-icon">
 <meta name="description" content="テスト中">
 <link rel="stylesheet" href="{{url_for('static',filename='/css/userstyle.css')}}">
+<link rel="stylesheet" href="{{url_for('static',filename='/css/userstyle2.css')}}">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/Modaal/0.4.4/css/modaal.min.css">
 <!--<link rel="stylesheet" href="{{url_for('static',filename='button.css')}}">-->
 <!-- <meta http-equiv="refresh" content=10; URL="http://127.0.0.1:5000"> -->
+
+
+
+
 {% endblock %}
 
 {% block body %}
+
+<!-- Socket.IOのクライアントライブラリを追加 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+
+<script>
+    // サーバーに接続
+    var socket = io.connect('/');
+
+    // サーバーからのイベントをリッスン
+    socket.on('update_data', function(data) {
+        location.reload();  // ページをリロード
+    });
+</script>
+
 <h1 style="text-align:center"><font size="20">ParKeeper</font></h1>
 
 <!--<div style="padding: 10px; margin-bottom: 10px; border: 1px solid #333333;">
@@ -43,60 +64,42 @@
   <script src="/static/js/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <script src="/static/js/jquery.bxslider.min.js"></script>
   <script src="/static/js/bxSlider.js"></script>
+  <script src="/static/js/modaalmin.js"></script>
 
 <div style="padding: 10px; margin-bottom: 10px; border: 1px solid #333333;">
     {% if indexga_res<100 %}
     {% if loca_yoyogi=="ALL" %}
     <font size="10">トイレAは{{indextoa_res}}人使用しました。</font><br>
-    <font size="10">トイレBは{{indextob_res}}人使用しました。</font></br>
     <font size="10">ゴミ箱は{{indexga_res}}%蓄積されています。</font>
     {% elif loca_yoyogi=="トイレA" %}
     <font size="10" color="red">トイレAは{{indextoa_res}}人使用しました。</font><br>
-    <font size="10">トイレBは{{indextob_res}}人使用しました。</font></br>
-    <font size="10">ゴミ箱は{{indexga_res}}%蓄積されています。</font>
-    {% elif loca_yoyogi=="トイレB" %}
-    <font size="10">トイレAは{{indextoa_res}}人使用しました。</font><br>
-    <font size="10" color="red">トイレBは{{indextob_res}}人使用しました。</font></br>
     <font size="10">ゴミ箱は{{indexga_res}}%蓄積されています。</font>
     {% elif loca_yoyogi=="ゴミ箱A" %}
     <font size="10">トイレAは{{indextoa_res}}人使用しました。</font><br>
-    <font size="10">トイレBは{{indextob_res}}人使用しました。</font></br>
     <font size="10" color="red">ゴミ箱は{{indexga_res}}%蓄積されています。</font>
     {% endif %}
 
     {% else %}
     {% if loca_yoyogi=="ALL" %}
     <font size="10">トイレAは{{indextoa_res}}人使用しました。</font><br>
-    <font size="10">トイレBは{{indextob_res}}人使用しました。</font></br>
     <font size="10"color="red">ゴミ箱は溢れています</font>
     {% elif loca_yoyogi=="トイレA" %}
     <font size="10" color="red">トイレAは{{indextoa_res}}人使用しました。</font><br>
-    <font size="10">トイレBは{{indextob_res}}人使用しました。</font></br>
-    <font size="10"color="red">ゴミ箱は溢れています</font>
-    {% elif loca_yoyogi=="トイレB" %}
-    <font size="10">トイレAは{{indextoa_res}}人使用しました。</font><br>
-    <font size="10" color="red">トイレBは{{indextob_res}}人使用しました。</font></br>
     <font size="10"color="red">ゴミ箱は溢れています</font>
     {% elif loca_yoyogi=="ゴミ箱A" %}
     <font size="10">トイレAは{{indextoa_res}}人使用しました。</font><br>
-    <font size="10">トイレBは{{indextob_res}}人使用しました。</font></br>
     <font size="10" color="red">ゴミ箱は溢れています</font>
     {% endif %}
     {% endif %}
 </div>
 <div id="left">
     
-    <form action="/useryoyogi"  method="POST">
+    <form action="/"  method="POST">
     <input type = "submit" name = "ubtn" value = "ALL" class="btn_01"></input>
     {% if loca_yoyogi=="トイレA" %}
     <input type = "submit" name = "ubtn" value = "トイレA" class="btn_ch"></input>
     {%else%}
     <input type = "submit" name = "ubtn" value = "トイレA" class="btn_02"></input>
-    {%endif%}
-    {% if loca_yoyogi=="トイレB" %}
-    <input type = "submit" name = "ubtn" value = "トイレB" class="btn_ch"></input>
-    {%else%}
-    <input type = "submit" name = "ubtn" value = "トイレB" class="btn_03"></input>
     {%endif%}
     {% if loca_yoyogi=="ゴミ箱A" %}
     <input type = "submit" name = "ubtn" value = "ゴミ箱A" class="btn_ch"></input>
@@ -114,16 +117,56 @@
 
   <hr>
 <div id="main">
-<iframe  class= "frame_center" src="http://127.0.0.1:5000/mapyoyogi/{{loca_yoyogi}}" width="100%" height="500" style="border-radius: 20px;"></iframe>
+<iframe  class= "frame_center" src="/{{loca_yoyogi}}" width="100%" height="500" style="border-radius: 20px;"></iframe>
 </div></form>
+
+
+
+
+
 <div id="footer">
-    <a href="{{url_for('map')}}">
-        <!--urlはリンク先の関数名-->
-        <button class="favorite styled"
+  
+
+
+    
+
+        
+          <a href="#info-1" class="info">
+            <button class="favorite styled"
             type="button" >
-        ログアウト
-        </button></a>
+          <dl>リセットボタン</dl></button>
+          </a>
+      
+
+      
+      <section id="info-1" class="hide-area">
+        <form action="/" method="POST" autocomplete="off">
+        <h1>リセットするトイレを選択してください</h1></br>
+        
+          <label ><input type="checkbox" name="reseta" value="1"><font size="5px">トイレA</font></label></br>
+          
+          <label ><font size="5px">Password:</font></label>
+          <label><input type="text" class=".btn_01" name="resetp" ></label>
+          <button>送信</button>
+        </form>
+        <p>
+          パスワードを忘れた方は<a href="https://forms.gle/tFyBFGpPaKYAcbgT6">こちら</a>からパスワードの再認証をお願いします。
+        </p>
+        </section>
+      
+        <a href="{{url_for('login')}}">
+          <!--urlはリンク先の関数名-->
+          <button class="favorite styled"
+              type="button" >
+              <dl>ログイン</dl>
+          </button></a>
+      
+        
     </div>
 <h2>最終更新時刻：{{dt_now}}</h2>
 
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="  crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Modaal/0.4.4/js/modaal.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+<script src="https://coco-factory.jp/ugokuweb/wp-content/themes/ugokuweb/data/9-6-3/js/9-6-3.js"></script>
 {% endblock %}
