@@ -3,5 +3,5 @@
   "packet_name" : "esp32_relay6",
   "packet_routeTS" : "relay6_toserver",
   "packet_routeTD" : "relay6_todevice"
-  "packet_routeTSS" : "relay6_forsenser2"
+  "packet_routeTSS" : "relay6_tosenser2"
 }
