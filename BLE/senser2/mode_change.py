@@ -17,7 +17,7 @@ def Change(Cmode):
         packet_tuple = packet_list
     
     elif Cmode is 2:
-        #relay6_forsenser2
+        #relay6_tosenser2
         packet_list = list(packet)
         packet_list[0] = '746f73656e73657232' #tosenser2
         packet_tuple = packet_list
