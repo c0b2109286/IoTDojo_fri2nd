@@ -82,7 +82,7 @@ class BLE:
             self._connections.remove(conn_handle)
             # start the advertisement again to allow the new connection
             self._check = False
-            self._advertise()
+            #self._advertise()
 
         elif event == _IRQ_GATTS_INDICATE_DONE:
             conn_handle, value_handle, status = data
